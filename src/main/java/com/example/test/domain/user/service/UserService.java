@@ -19,6 +19,15 @@ public class UserService {
 
     public void saveUser(RequestUserDto requestUserDto) {
 
+        if(userRepository.existsByUsername(requestUserDto.username())) {
+            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
+        }
+
+        // 비밀번호 불일치
+        if(!requestUserDto.password().equals(requestUserDto.checkPassword())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
         String encodedPassword = passwordEncoder.encode(requestUserDto.password());
         User user = requestUserDto.dtoToEntity(encodedPassword);
         userRepository.save(user);
