@@ -1,6 +1,7 @@
 package com.example.test.domain.user.service;
 
 import com.example.test.domain.user.dto.request.RequestUserDto;
+import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -21,5 +22,10 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(requestUserDto.password());
         User user = requestUserDto.dtoToEntity(encodedPassword);
         userRepository.save(user);
+    }
+
+    public ResponseUserDto findUser(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow();
+        return ResponseUserDto.dtoToEntity(user);
     }
 }

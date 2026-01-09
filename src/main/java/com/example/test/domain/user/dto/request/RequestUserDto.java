@@ -5,12 +5,14 @@ import com.example.test.domain.user.entity.User;
 
 public record RequestUserDto(
         String username,
-        String password
+        String password,
+        String nickName
 ) {
     public User dtoToEntity(String encodedPassword) {
         return User.builder()
                 .username(username)
                 .password(encodedPassword)
+                .nickName(nickName)
                 .build();
     }
 }
