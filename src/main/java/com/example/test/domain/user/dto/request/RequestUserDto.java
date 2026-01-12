@@ -1,11 +1,13 @@
 package com.example.test.domain.user.dto.request;
 
 import com.example.test.domain.user.entity.User;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 
 public record RequestUserDto(
         @NotBlank(message = "아이디 채워라")
+        @Email
         String username,
 
         @NotBlank(message = "비밀번호 채워라")

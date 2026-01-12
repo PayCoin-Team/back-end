@@ -61,7 +61,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/login", "/", "/users").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
-                        .requestMatchers("/reissue").permitAll()
+                        .requestMatchers("/reissue", "/users/check-username").permitAll()
                         .anyRequest().authenticated());
 
         // JwtFilter

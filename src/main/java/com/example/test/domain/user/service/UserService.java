@@ -37,4 +37,8 @@ public class UserService {
         User user = userRepository.findById(userId).orElseThrow();
         return ResponseUserDto.dtoToEntity(user);
     }
+
+    public boolean checkUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
 }
