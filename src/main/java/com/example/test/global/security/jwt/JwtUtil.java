@@ -18,6 +18,11 @@ public class JwtUtil {
         this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    public String getCategory(String token) {
+
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
+    }
+
     public Long getUserId(String token) {
 
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
@@ -38,8 +43,9 @@ public class JwtUtil {
     }
 
     // jwt 생성
-    public String createJwt(Long id, String username, String role, Long expiredMs) {
+    public String createJwt(String category, Long id, String username, String role, Long expiredMs) {
         return Jwts.builder()
+                .claim("category", category)
                 .claim("id", id)
                 .claim("username", username)
                 .claim("role", role)

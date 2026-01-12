@@ -2,7 +2,6 @@ package com.example.test.domain.user.dto.request;
 
 import com.example.test.domain.user.entity.User;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 
 
 public record RequestUserDto(
