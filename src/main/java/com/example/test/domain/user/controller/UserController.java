@@ -37,7 +37,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.findUser(user.getId()));
     }
 
-    @GetMapping("/check-username")
+    @GetMapping("/me")
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.checkUsername(username));
     }
