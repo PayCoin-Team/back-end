@@ -45,6 +45,7 @@ public class Nonce {
     public Nonce(String nonce, String walletAddress, User user, int expiryMinutes) {
         this.nonce = nonce;
         this.walletAddress = walletAddress;
+        this.user = user;
         this.createdAt = LocalDateTime.now();
         this.expiredAt = this.createdAt.plusMinutes(expiryMinutes);
     }
