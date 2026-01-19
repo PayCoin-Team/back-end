@@ -6,12 +6,16 @@ import lombok.Builder;
 @Builder
 public record ResponseUserDto(
         String username,
-        String nickName
+        String email,
+        String firstName,
+        String lastName
 ) {
     public static ResponseUserDto dtoToEntity(User user) {
         return ResponseUserDto.builder()
                 .username((user.getUsername()))
-                .nickName(user.getNickName())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
                 .build();
     }
 }

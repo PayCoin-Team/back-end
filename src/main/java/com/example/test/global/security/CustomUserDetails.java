@@ -1,6 +1,7 @@
 package com.example.test.global.security;
 
 import com.example.test.domain.user.entity.User;
+import com.example.test.domain.user.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -60,10 +61,11 @@ public class CustomUserDetails implements UserDetails {
         return true;
     }
 
+    // 탈퇴한 회원 접근 차단
     @Override
     public boolean isEnabled() {
 
-        return true;
+        return user.getRole() != Role.WITH_DRAW;
     }
 
     // id 불러오기
