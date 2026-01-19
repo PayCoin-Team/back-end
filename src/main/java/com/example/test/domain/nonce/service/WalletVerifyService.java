@@ -12,8 +12,12 @@ import com.example.test.domain.user.repository.UserRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.bitcoinj.core.Base58;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
+import org.web3j.utils.Numeric;
 
 import java.util.UUID;
 
@@ -71,11 +75,36 @@ public class WalletVerifyService {
         }
 
         // 5. 서명 검증
-        // 암호학적 서명 검증 필요 (Web3j)
-        String recoveredAddress = requestDto.address();
+        String message = nonce.getNonce();
+        String signature = requestDto.signature();
+
+        // 트론 서명 메세지 접두사 적용
+        String prefix = "\u0019TRON Signed Message:\n" + message.length();
+        byte[] msgHash = org.web3j.crypto.Hash.sha3((prefix + message).getBytes());
+
+        // 서명 데이터(v, r, s) 복구
+        byte[] signatureBytes = Numeric.hexStringToByteArray(signature);
+        byte v = signatureBytes[64];
+        if (v < 27) v += 27;
+
+        Sign.SignatureData sd = new Sign.SignatureData(
+                v,
+                java.util.Arrays.copyOfRange(signatureBytes, 0, 32),
+                java.util.Arrays.copyOfRange(signatureBytes, 32, 64)
+        );
+
+        String recoveredAddress;
+        try {
+            // 공개키 추출 및 주소(Hex) 변환
+            java.math.BigInteger publicKey = Sign.signedMessageHashToKey(msgHash, sd);
+            recoveredAddress = "41" + Keys.getAddress(publicKey);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_SIGNATURE);
+        }
 
         // 6. DB 주소 대조
-        if (!recoveredAddress.equalsIgnoreCase(nonce.getWalletAddress())) {
+        String storedHexAddress = convertToHex(nonce.getWalletAddress());
+        if (!recoveredAddress.equalsIgnoreCase(storedHexAddress)) {
             throw new CustomException(ErrorCode.INVALID_SIGNATURE);
         }
 
@@ -85,5 +114,18 @@ public class WalletVerifyService {
 
         externalWalletRepository.save(new ExternalWallet(user, recoveredAddress));
         nonceRepository.delete(nonce);
+    }
+
+    private String convertToHex(String base58Address) {
+        if (base58Address.startsWith("41")) return base58Address;
+
+        try {
+            // Base58 디코딩 (체크섬 포함 25바이트)
+            byte[] decoded = Base58.decodeChecked(base58Address);
+            // 디코딩된 바이트를 Hex 문자열로 변환
+            return Numeric.toHexStringNoPrefix(decoded).toLowerCase();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_SIGNATURE);
+        }
     }
 }
