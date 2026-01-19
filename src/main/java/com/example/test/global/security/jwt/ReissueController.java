@@ -62,7 +62,8 @@ public class ReissueController {
 
         String newAccess = jwtUtil.createJwt("access", userId, username, role, 600000L);
 
-        response.setHeader("access", newAccess);
+        response.setHeader("Authorization", "Bearer " + newAccess);
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

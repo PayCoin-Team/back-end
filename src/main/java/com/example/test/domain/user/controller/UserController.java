@@ -5,6 +5,7 @@ import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.service.UserService;
 import com.example.test.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "User API", description = "유저 관련(정보 조회, 수정 등) API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
