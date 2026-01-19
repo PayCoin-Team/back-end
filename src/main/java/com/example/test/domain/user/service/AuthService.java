@@ -20,7 +20,7 @@ public class AuthService {
 
     // 회원가입
     public void saveUser(RequestUserDto requestUserDto) {
-        // 이름 중복 예외
+        // 아이디 중복 예외
         if(userRepository.existsByUsername(requestUserDto.username())) {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }

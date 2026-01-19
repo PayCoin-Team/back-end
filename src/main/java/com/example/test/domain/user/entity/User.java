@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+// extends BaseTimeEntity -> createdAt, updatedAt 자동 생성
 public class User extends BaseTimeEntity {
 
     @Id
