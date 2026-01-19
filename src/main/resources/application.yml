@@ -18,9 +18,9 @@ tron:
     base-url: https://nile.trongrid.io
     timeout-ms: 8000
   token:
-    usdt-contract: "TBDCmYiKxyGBXnDFkivM3kpbAJs3twmW9L"
+    usdt-contract: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
   wallet:
-    server-address: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
+    server-address: "TBDCmYiKxyGBXnDFkivM3kpbAJs3twmW9L"
   polling:
     interval-ms: 3000
     batch-size: 50
