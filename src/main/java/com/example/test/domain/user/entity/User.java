@@ -1,5 +1,6 @@
 package com.example.test.domain.user.entity;
 
+import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.enums.Role;
 import com.example.test.global.time.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -39,5 +40,15 @@ public class User extends BaseTimeEntity {
         this.firstName = firstName;
         this.lastName = lastName;
         this.role = Role.ROLE_USER;
+    }
+
+    public void updateProfile(UpdateUserDto updateUserDto){
+        if(updateUserDto.username() != null) this.username = updateUserDto.username();
+        if(updateUserDto.firstName() != null) this.firstName = updateUserDto.firstName();
+        if(updateUserDto.lastName() != null) this.lastName = updateUserDto.lastName();
+    }
+
+    public void deleteProfile() {
+        this.role = Role.WITH_DRAW;
     }
 }

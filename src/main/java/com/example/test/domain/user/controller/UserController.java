@@ -1,6 +1,7 @@
 package com.example.test.domain.user.controller;
 
 import com.example.test.domain.user.dto.request.RequestUserDto;
+import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.service.UserService;
 import com.example.test.global.security.CustomUserDetails;
@@ -19,26 +20,30 @@ public class UserController {
 
     private final UserService userService;
 
-    @PostMapping()
-    public ResponseEntity<String> join(
-            @Valid
-            @RequestBody
-            RequestUserDto requestUserDto
-    ){
-        userService.saveUser(requestUserDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("회원가입 성공");
-    }
-
-
-    @GetMapping("/find")
+    // 내 정보 조회
+    @GetMapping("/me")
     public ResponseEntity<ResponseUserDto> findUser(
             @AuthenticationPrincipal CustomUserDetails user
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.findUser(user.getId()));
+        return ResponseEntity.status(HttpStatus.OK).body(userService.findUser(user.getId()));
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.checkUsername(username));
+    // 내 정보 수정
+    @PatchMapping("/update")
+    public ResponseEntity<String> updateUser(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody UpdateUserDto updateUserDto
+    ) {
+        userService.updateUser(user.getId(), updateUserDto);
+        return ResponseEntity.status(HttpStatus.OK).body("회원 정보 수정 완료");
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> withdraw(
+        @AuthenticationPrincipal CustomUserDetails user
+    ) {
+        userService.deleteUser(user.getId());
+        return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴되었습니다.");
     }
 }

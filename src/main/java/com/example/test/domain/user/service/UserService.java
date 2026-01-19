@@ -1,9 +1,12 @@
 package com.example.test.domain.user.service;
 
 import com.example.test.domain.user.dto.request.RequestUserDto;
+import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.user.repository.UserRepository;
+import com.example.test.global.exception.CustomException;
+import com.example.test.global.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,30 +18,27 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
 
-    public void saveUser(RequestUserDto requestUserDto) {
-
-        if(userRepository.existsByUsername(requestUserDto.username())) {
-            throw new IllegalArgumentException("이미 사용 중인 아이디입니다.");
-        }
-
-        // 비밀번호 불일치
-        if(!requestUserDto.password().equals(requestUserDto.checkPassword())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
-        String encodedPassword = passwordEncoder.encode(requestUserDto.password());
-        User user = requestUserDto.dtoToEntity(encodedPassword);
-        userRepository.save(user);
-    }
-
+    // 회원 정보 조회
     public ResponseUserDto findUser(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
         return ResponseUserDto.dtoToEntity(user);
     }
 
-    public boolean checkUsername(String username) {
-        return userRepository.existsByUsername(username);
+    // 회원 정보 변경
+    public void updateUser(Long userId, UpdateUserDto updateUserDto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.updateProfile(updateUserDto);
+    }
+
+    // 회원 탈퇴
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        user.deleteProfile();
     }
 }
