@@ -1,4 +1,8 @@
 package com.example.test.domain.polling.dto;
 
-public record TransferResult() {
-}
+// 컨트랙트 상세 정보
+public record TransferResult(
+        String from,
+        String to,
+        String value
+) {}
