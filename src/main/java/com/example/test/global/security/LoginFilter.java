@@ -82,7 +82,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String refresh = jwtUtil.createJwt("refresh", userId, username, role, REFRESH_TOKEN_EXPIRED_TIME);
 
         //응답 설정
-        response.setHeader("access", access);
+        response.setHeader("Authorization", "Bearer " + access);
+        response.setHeader("Access-Control-Expose-Headers", "Authorization");
         response.addCookie(createCookie("refresh", refresh));
         response.setStatus(HttpStatus.OK.value());
 

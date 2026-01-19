@@ -26,15 +26,16 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         // 헤더에서 access키에 담긴 토큰을 꺼냄
-        String accessToken = request.getHeader("access");
+        String authorization = request.getHeader("Authorization");
 
         // 토큰이 없다면 다음 필터로 넘김
-        if (accessToken == null) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
 
             filterChain.doFilter(request, response);
-
             return;
         }
+
+        String accessToken = authorization.split(" ")[1];
 
         // 토큰 만료 여부 확인
         try {

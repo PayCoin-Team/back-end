@@ -17,8 +17,7 @@ public class AuthController {
 
     @PostMapping("/join")
     public ResponseEntity<String> join(
-            @Valid
-            @RequestBody
+            @Valid @RequestBody
             RequestUserDto requestUserDto
     ){
         authService.saveUser(requestUserDto);
