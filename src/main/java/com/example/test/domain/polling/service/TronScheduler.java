@@ -20,18 +20,12 @@ public class TronScheduler {
     @Scheduled(fixedDelayString = "${tron.polling.interval-ms}")
     public void pollingUsdt(){
 
-        log.info("polling");
-
         tronGridClient.get().uri(uriBuilder -> uriBuilder.path("/v1/contracts/{address}/events") // polling api 경로
                 .queryParam("event_name", "Transfer")
                 .queryParam("order_by", "timestamp,asc")
                 .build(properties.token().usdtContract())) // {address}에 컨트랙트 주소 넣기
                 .retrieve() // 응답 추출
                 .bodyToMono(TronGridResponse.class) // Body를 자바 객체로
-                .doOnNext(res -> log.info("polling response success={}, dataSize={}",
-                        res != null ? res.success() : null,
-                        res != null && res.data() != null ? res.data().size() : null))
-                .doOnError(e -> log.error("polling request failed", e))
                 .subscribe(response -> {
                     if (response != null && response.success()) {
                         pollingService.processEvents(response.data());
