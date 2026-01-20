@@ -10,9 +10,7 @@ public record ResponseUserDto(
         String username,
         String email,
         String firstName,
-        String lastName,
-        BigDecimal balance,
-        String publicAddress
+        String lastName
 ) {
     public static ResponseUserDto dtoToEntity(User user) {
         return ResponseUserDto.builder()
@@ -20,8 +18,6 @@ public record ResponseUserDto(
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .balance(user.getUserWallet().getBalance())
-                .publicAddress(user.getUserWallet().getPublicAddress())
                 .build();
     }
 }

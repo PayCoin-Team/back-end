@@ -22,7 +22,7 @@ public enum ErrorCode {
     INVALID_USER_ATTEMPT(403, "잘못된 유저의 접근입니다."),
 
     // 내부 지갑 관련 오류
-    USER_WALLET_NOT_FOUND(404, "해당 지갑 주소는 없는 주소입니다."),
+    USER_WALLET_NOT_FOUND(404, "해당 주소는 존재하지 않는 지갑입니다."),
     SELF_TRANSFER_INVALID(400, "자신에게 송금은 불가합니다."),
     INSUFFICIENT_BALANCE(400, "잔액이 부족합니다. 다시 시도해 주세요.");
 

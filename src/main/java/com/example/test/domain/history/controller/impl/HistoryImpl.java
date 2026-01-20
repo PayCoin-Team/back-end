@@ -2,7 +2,6 @@ package com.example.test.domain.history.controller.impl;
 
 import com.example.test.domain.history.dto.request.RequestTransferDto;
 import com.example.test.domain.history.dto.response.ResponseTransferDto;
-import com.example.test.domain.nonce.dto.request.NonceRequestDto;
 import com.example.test.domain.nonce.dto.response.NonceResponseDto;
 import com.example.test.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -16,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@Tag(name = "History API", description = "내부 지갑(내부 송금, 거래 내역 조회) 관련 API")
+@Tag(name = "History API", description = "내부 지갑 거래(내부 송금, 거래 내역 조회) 관련 API")
 public interface HistoryImpl {
 
     @Operation(summary = "내부 송금 요청", description = "")
