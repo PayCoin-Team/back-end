@@ -21,6 +21,8 @@ public enum ErrorCode {
     ALREADY_LINKED_WALLET(409, "이미 다른 계정에 연동된 지갑 주소입니다."),
     INVALID_USER_ATTEMPT(403, "잘못된 유저의 접근입니다."),
 
+    // 통화 관련 오류
+    EXCHANGE_RATE_NOT_FOUND(404, "통화를 찾을 수 없습니다."),
     // 폴링 관련 오류
     ROW_NOT_FOUND(500,"polling 테이블에 초기 row가 없습니다."),
     TRON_API_ERROR(500, "API로 데이터를 가져오지 못했습니다.");
