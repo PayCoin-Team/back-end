@@ -29,7 +29,8 @@ public interface HistoryImpl {
             @ApiResponse(responseCode = "201", description = "내부 송금 성공",
                     content = @Content(schema = @Schema(implementation = NonceResponseDto.class))),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
-            @ApiResponse(responseCode = "404", description = "해당 지갑 주소 없음", content = @Content)
+            @ApiResponse(responseCode = "404", description = "해당 지갑 주소 없음", content = @Content),
+            @ApiResponse(responseCode = "400", description = "송금 차단(자신에게 송금 or 잔액 부족)", content = @Content)
     })
     ResponseEntity<ResponseTransferDto> transfer(
             @Parameter(hidden = true)
