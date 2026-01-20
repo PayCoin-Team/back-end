@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.List;
@@ -68,14 +67,6 @@ public class PollingService {
 
             // transfer 이벤트들 추출
             List<TronTransfer> transfers = tron.data();
-
-            if (!transfers.isEmpty()) {
-                long firstTs = transfers.get(0).blockTimestamp();
-                long lastTs  = transfers.get(transfers.size() - 1).blockTimestamp();
-
-                log.info("이번 페이지 ts 범위(ms): first={}, last={}, count={}",
-                        firstTs, lastTs, transfers.size());
-            }
 
             // 입출금 처리
             handleTransfer(transfers);
