@@ -12,3 +12,15 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+tron:
+  trongrid:
+    base-url: https://nile.trongrid.io
+    timeout-ms: 8000
+  token:
+    usdt-contract: "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf"
+  wallet:
+    server-address: "TBDCmYiKxyGBXnDFkivM3kpbAJs3twmW9L"
+  polling:
+    interval-ms: 3000
+    batch-size: 50
