@@ -55,8 +55,8 @@ public class PollingService {
                             }
                             return b.build(properties.wallet().serverAddress());
                         })
-                        .retrieve()
-                        .bodyToMono(TronGridResponse.class)
+                        .retrieve() // 응답 받기
+                        .bodyToMono(TronGridResponse.class) // 응답 바디 객체로 변환
                         .block();
             }catch (WebClientResponseException e){
                 throw new CustomException(ErrorCode.TRON_API_ERROR);
