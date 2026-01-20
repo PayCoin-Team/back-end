@@ -24,7 +24,12 @@ public enum ErrorCode {
     // 내부 지갑 관련 오류
     USER_WALLET_NOT_FOUND(404, "해당 주소는 존재하지 않는 지갑입니다."),
     SELF_TRANSFER_INVALID(400, "자신에게 송금은 불가합니다."),
-    INSUFFICIENT_BALANCE(400, "잔액이 부족합니다. 다시 시도해 주세요.");
+    INSUFFICIENT_BALANCE(400, "잔액이 부족합니다. 다시 시도해 주세요."),
+    // 통화 관련 오류
+    EXCHANGE_RATE_NOT_FOUND(404, "통화를 찾을 수 없습니다."),
+    // 폴링 관련 오류
+    ROW_NOT_FOUND(500,"polling 테이블에 초기 row가 없습니다."),
+    TRON_API_ERROR(500, "API로 데이터를 가져오지 못했습니다.");
 
     private final int status;
     private final String message;
