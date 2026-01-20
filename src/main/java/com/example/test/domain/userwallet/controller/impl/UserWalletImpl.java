@@ -1,6 +1,6 @@
 package com.example.test.domain.userwallet.controller.impl;
 
-import com.example.test.domain.history.dto.response.ResponseUserWalletDto;
+import com.example.test.domain.userwallet.dto.response.ResponseUserWalletDto;
 import com.example.test.domain.nonce.dto.response.NonceResponseDto;
 import com.example.test.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;

@@ -1,6 +1,6 @@
 package com.example.test.domain.userwallet.controller;
 
-import com.example.test.domain.history.dto.response.ResponseUserWalletDto;
+import com.example.test.domain.userwallet.dto.response.ResponseUserWalletDto;
 import com.example.test.domain.userwallet.controller.impl.UserWalletImpl;
 import com.example.test.domain.userwallet.service.UserWalletService;
 import com.example.test.global.security.CustomUserDetails;

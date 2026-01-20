@@ -1,8 +1,10 @@
 package com.example.test.domain.history.service;
 
 import com.example.test.domain.history.dto.request.RequestTransferDto;
+import com.example.test.domain.history.dto.response.ResponseHistoryDto;
 import com.example.test.domain.history.dto.response.ResponseTransferDto;
 import com.example.test.domain.history.entity.History;
+import com.example.test.domain.history.enums.Type;
 import com.example.test.domain.history.repository.HistoryRepository;
 import com.example.test.domain.user.repository.UserRepository;
 import com.example.test.domain.userwallet.entity.UserWallet;
@@ -10,6 +12,8 @@ import com.example.test.domain.userwallet.repository.UserWalletRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,5 +53,20 @@ public class HistoryService {
         historyRepository.save(history);
 
         return new ResponseTransferDto(history.getId(), senderWallet.getBalance());
+    }
+
+    // 서비스 거래 내역 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseHistoryDto> findHistory(
+            Long userId,
+            Integer year,
+            Integer month,
+            Type type,
+            Pageable pageable
+    ) {
+
+        Page<History> histories = historyRepository.searchHistories(userId, year, month, type, pageable);
+
+        return histories.map(history -> ResponseHistoryDto.of(history, userId));
     }
 }

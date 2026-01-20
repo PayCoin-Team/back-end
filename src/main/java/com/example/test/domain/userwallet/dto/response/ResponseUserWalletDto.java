@@ -1,6 +1,5 @@
-package com.example.test.domain.history.dto.response;
+package com.example.test.domain.userwallet.dto.response;
 
-import com.example.test.domain.user.entity.User;
 import com.example.test.domain.userwallet.entity.UserWallet;
 import lombok.Builder;
 

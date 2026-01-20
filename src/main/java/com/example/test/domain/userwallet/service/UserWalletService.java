@@ -1,6 +1,6 @@
 package com.example.test.domain.userwallet.service;
 
-import com.example.test.domain.history.dto.response.ResponseUserWalletDto;
+import com.example.test.domain.userwallet.dto.response.ResponseUserWalletDto;
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.userwallet.entity.UserWallet;
 import com.example.test.domain.userwallet.repository.UserWalletRepository;
