@@ -1,5 +1,6 @@
 package com.example.test.domain.user.controller;
 
+import com.example.test.domain.user.controller.api.UserApi;
 import com.example.test.domain.user.dto.request.RequestUserDto;
 import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
@@ -14,11 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "User API", description = "유저 관련(정보 조회, 수정 등) API")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
-public class UserController {
+public class UserController implements UserApi {
 
     private final UserService userService;
 

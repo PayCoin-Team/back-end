@@ -1,10 +1,9 @@
-package com.example.test.domain.history.controller.impl;
+package com.example.test.domain.history.controller.api;
 
 import com.example.test.domain.history.dto.request.RequestTransferDto;
 import com.example.test.domain.history.dto.response.ResponseHistoryDto;
 import com.example.test.domain.history.dto.response.ResponseTransferDto;
 import com.example.test.domain.history.enums.Type;
-import com.example.test.domain.nonce.dto.response.NonceResponseDto;
 import com.example.test.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "History API", description = "내부 지갑 거래(내부 송금, 거래 내역 조회) 관련 API")
-public interface HistoryImpl {
+public interface HistoryApi {
 
     @Operation(summary = "내부 송금 요청", description = "")
     @ApiResponses(value = {

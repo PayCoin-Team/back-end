@@ -1,5 +1,6 @@
 package com.example.test.domain.user.controller;
 
+import com.example.test.domain.user.controller.api.AuthApi;
 import com.example.test.domain.user.dto.request.RequestUserDto;
 import com.example.test.domain.user.service.AuthService;
 import com.example.test.global.security.LoginFilter;
@@ -10,11 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Authentication API", description = "인증 관련 API (로그인/로그아웃/회원가입)")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthController implements AuthApi {
 
     private final AuthService authService;
 

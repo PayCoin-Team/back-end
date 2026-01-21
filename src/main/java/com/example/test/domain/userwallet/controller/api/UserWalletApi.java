@@ -1,7 +1,6 @@
-package com.example.test.domain.userwallet.controller.impl;
+package com.example.test.domain.userwallet.controller.api;
 
 import com.example.test.domain.userwallet.dto.response.ResponseUserWalletDto;
-import com.example.test.domain.nonce.dto.response.NonceResponseDto;
 import com.example.test.global.security.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,7 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Tag(name = "UserWallet API", description = "사용자 내부 지갑 관련 API")
-public interface UserWalletImpl {
+public interface UserWalletApi {
 
     @Operation(summary = "사용자 내부 지갑 정보 조회", description = "")
     @ApiResponses(value = {
