@@ -2,6 +2,7 @@ package com.example.test.domain.user.entity;
 
 import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.enums.Role;
+import com.example.test.domain.userwallet.entity.UserWallet;
 import com.example.test.global.time.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -32,6 +33,10 @@ public class User extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // User 생성하면 UserWallet도 생성되어야 함
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+    private UserWallet userWallet;
 
     @Builder
     public User(String username, String email, String password, String firstName, String lastName) {

@@ -3,6 +3,9 @@ package com.example.test.domain.user.service;
 import com.example.test.domain.user.dto.request.RequestUserDto;
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.user.repository.UserRepository;
+import com.example.test.domain.userwallet.entity.UserWallet;
+import com.example.test.domain.userwallet.repository.UserWalletRepository;
+import com.example.test.domain.userwallet.service.UserWalletService;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import jakarta.transaction.Transactional;
@@ -17,6 +20,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+    private final UserWalletService userWalletService;
 
     // 회원가입
     public void saveUser(RequestUserDto requestUserDto) {
@@ -32,6 +36,11 @@ public class AuthService {
 
         String encodedPassword = passwordEncoder.encode(requestUserDto.password());
         User user = requestUserDto.dtoToEntity(encodedPassword);
+
+        // 유저 내부 지갑 생성
+        UserWallet userWallet = userWalletService.generate(user);
+        user.setUserWallet(userWallet);
+
         userRepository.save(user);
     }
 

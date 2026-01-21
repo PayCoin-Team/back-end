@@ -21,6 +21,10 @@ public enum ErrorCode {
     ALREADY_LINKED_WALLET(409, "이미 다른 계정에 연동된 지갑 주소입니다."),
     INVALID_USER_ATTEMPT(403, "잘못된 유저의 접근입니다."),
 
+    // 내부 지갑 관련 오류
+    USER_WALLET_NOT_FOUND(404, "해당 주소는 존재하지 않는 지갑입니다."),
+    SELF_TRANSFER_INVALID(400, "자신에게 송금은 불가합니다."),
+    INSUFFICIENT_BALANCE(400, "잔액이 부족합니다. 다시 시도해 주세요."),
     // 통화 관련 오류
     EXCHANGE_RATE_NOT_FOUND(404, "통화를 찾을 수 없습니다."),
     // 폴링 관련 오류
