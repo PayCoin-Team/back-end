@@ -1,6 +1,8 @@
 package com.example.test.global.security.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -8,18 +10,22 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
 /*
-Access 토큰 만료 시
+Access 토큰 만료 시 재발급
  */
+@Tag(name = "Authentication API")
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class ReissueController {
 
     private final JwtUtil jwtUtil;
 
+    @Operation(summary = "토큰 재발급", description = "Refresh Token으로 Access Token 재발급 요청")
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
 

@@ -1,6 +1,6 @@
 package com.example.test.domain.history.controller;
 
-import com.example.test.domain.history.controller.impl.HistoryImpl;
+import com.example.test.domain.history.controller.api.HistoryApi;
 import com.example.test.domain.history.dto.request.RequestTransferDto;
 import com.example.test.domain.history.dto.response.ResponseHistoryDto;
 import com.example.test.domain.history.dto.response.ResponseTransferDto;
@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/history")
-public class HistoryController implements HistoryImpl {
+public class HistoryController implements HistoryApi {
 
     private final HistoryService historyService;
 
