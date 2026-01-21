@@ -3,6 +3,8 @@ package com.example.test.domain.user.dto.response;
 import com.example.test.domain.user.entity.User;
 import lombok.Builder;
 
+import java.math.BigDecimal;
+
 @Builder
 public record ResponseUserDto(
         String username,
