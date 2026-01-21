@@ -27,7 +27,7 @@ public interface HistoryImpl {
     @Operation(summary = "내부 송금 요청", description = "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "내부 송금 성공",
-                    content = @Content(schema = @Schema(implementation = NonceResponseDto.class))),
+                    content = @Content(schema = @Schema(implementation = ResponseTransferDto.class))),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
             @ApiResponse(responseCode = "404", description = "해당 지갑 주소 없음", content = @Content),
             @ApiResponse(responseCode = "400", description = "송금 차단(자신에게 송금 or 잔액 부족)", content = @Content)
@@ -43,7 +43,7 @@ public interface HistoryImpl {
     @Operation(summary = "특정 회원 서비스 거래 내역 조회", description = "")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "거래 내역 조회 성공",
-                    content = @Content(schema = @Schema(implementation = NonceResponseDto.class))),
+                    content = @Content(schema = @Schema(implementation = ResponseHistoryDto.class))),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
             @ApiResponse(responseCode = "400", description = "거래 내역 조회 실패", content = @Content)
     })
