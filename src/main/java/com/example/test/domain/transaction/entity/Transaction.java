@@ -37,9 +37,6 @@ public class Transaction extends BaseCreateEntity {
     @Column(name = "txid", length = 100)
     private String txid;
 
-    @Column(name = "log_index")
-    private Integer logIndex;
-
     @Size(max = 30)
     @NotNull
     @Column(name = "type", nullable = false, length = 30)
