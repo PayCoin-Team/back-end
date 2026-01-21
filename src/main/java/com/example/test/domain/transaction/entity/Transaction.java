@@ -43,12 +43,14 @@ public class Transaction extends BaseCreateEntity {
     @Size(max = 30)
     @NotNull
     @Column(name = "type", nullable = false, length = 30)
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private Type type;
 
     @Size(max = 30)
     @NotNull
     @Column(name = "status", nullable = false, length = 30)
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
