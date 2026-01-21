@@ -1,4 +1,4 @@
 package com.example.test.domain.transaction.dto;
 
-public record RequestTransactionDto() {
+public record RequestTransactionDto(String txid) {
 }
