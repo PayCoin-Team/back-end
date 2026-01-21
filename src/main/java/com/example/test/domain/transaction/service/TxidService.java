@@ -45,7 +45,7 @@ public class TxidService {
             // txid가 아직 네트워크에 없는 경우(400이나 404)를 PENDING으로 처리
             int code = e.getStatusCode().value();
 
-            if (code == 400 || code == 404) {
+            if (code == 404) {
                 tron = null;
             } else {
                 throw new CustomException(ErrorCode.TRON_API_ERROR);
