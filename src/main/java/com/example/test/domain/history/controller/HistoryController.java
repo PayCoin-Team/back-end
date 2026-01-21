@@ -39,13 +39,15 @@ public class HistoryController implements HistoryImpl {
     // 내부 거래 내역 조회
     @Override
     @GetMapping
-    public Page<ResponseHistoryDto> findHistory(
+    public ResponseEntity<Page<ResponseHistoryDto>> findHistory(
              @AuthenticationPrincipal CustomUserDetails customUserDetails,
              @RequestParam(required = false) Integer year,
              @RequestParam(required = false) Integer month,
              @RequestParam(required = false, defaultValue = "ALL") Type type,
              @ParameterObject Pageable pageable
     ) {
-        return historyService.findHistory(customUserDetails.getId(), year, month, type, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(historyService.findHistory(customUserDetails.getId(), year, month, type, pageable));
     }
 }

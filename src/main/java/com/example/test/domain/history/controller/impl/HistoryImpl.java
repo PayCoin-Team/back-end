@@ -47,7 +47,7 @@ public interface HistoryImpl {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
             @ApiResponse(responseCode = "400", description = "거래 내역 조회 실패", content = @Content)
     })
-    Page<ResponseHistoryDto> findHistory(
+    ResponseEntity<Page<ResponseHistoryDto>> findHistory(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
 

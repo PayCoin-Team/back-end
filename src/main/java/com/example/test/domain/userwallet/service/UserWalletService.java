@@ -19,6 +19,7 @@ public class UserWalletService {
 
     private final UserWalletRepository userWalletRepository;
 
+    // 사용자 내부 지갑 조회
     public ResponseUserWalletDto findUserWallet(Long userId) {
 
         UserWallet userWallet = userWalletRepository.findById(userId)
