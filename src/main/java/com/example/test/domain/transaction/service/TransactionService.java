@@ -3,7 +3,7 @@ package com.example.test.domain.transaction.service;
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 import com.example.test.domain.externalWallet.repository.ExternalWalletRepository;
 import com.example.test.domain.transaction.enums.Type;
-import com.example.test.domain.transaction.dto.request.RequestWithdrawDto;
+import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
 import com.example.test.domain.transaction.entity.Transaction;
 import com.example.test.domain.transaction.enums.Status;
@@ -36,10 +36,38 @@ public class TransactionService {
     @Value("${tron.wallet.server-address}")
     private String serviceWalletAddress;
 
-    public ResponseTransactionDto withdraw(Long userId, RequestWithdrawDto dto){
+    public ResponseTransactionDto deposit(
+            Long userId,
+            RequestTransactionDto dto
+    ) {
 
         // 유저 내부 지갑 조회
-        UserWallet userWallet = userWalletRepository.findById(userId)
+        UserWallet userWallet = userWalletRepository.findById(userId) // TODO: Lock 고려
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
+        // 유저 외부 지갑 조회
+        List<ExternalWallet> externalWallets = externalWalletRepository.findAllByUserId(userId);
+
+        ExternalWallet targetExternalWallet = externalWallets.stream()
+                .filter(wallet -> wallet.getAddress().equals(dto.walletAddress()))
+                .findFirst()
+                .orElseThrow(() -> new CustomException(ErrorCode.EXTERNAL_WALLET_NOT_FOUND));
+
+        // TODO: txId 검증 필요
+
+        // 유저 내부 지갑 잔액 변경 (검증 성공되면 내부 지갑 잔액 변경 및 상태 COMPLETED 변경)
+        // userWallet.setBalance(userWallet.getBalance().add(dto.amount()));
+
+        // 트랜잭션 기록
+        Transaction transaction = dto.depositToEntity(targetExternalWallet, serviceWalletAddress);
+        Transaction savedTransaction = transactionRepository.save(transaction);
+
+        return ResponseTransactionDto.from(savedTransaction);
+    }
+
+    public ResponseTransactionDto withdraw(Long userId, RequestTransactionDto dto){
+
+        // 유저 내부 지갑 조회
+        UserWallet userWallet = userWalletRepository.findById(userId) // TODO: Lock 고려
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
 
         // 외부 지갑들 조회
@@ -57,7 +85,7 @@ public class TransactionService {
         // 유저 내부 지갑 잔액 차감
         userWallet.setBalance(userWallet.getBalance().subtract(dto.amount()));
         // PENDING 상태로 DB에 저장
-        Transaction transaction = dto.dtoToEntity(targetExternalWallet, serviceWalletAddress);
+        Transaction transaction = dto.withdrawToEntity(targetExternalWallet, serviceWalletAddress);
         var savedTransaction = transactionRepository.save(transaction);
 
         try {
