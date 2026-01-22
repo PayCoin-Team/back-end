@@ -1,6 +1,7 @@
 package com.example.test.domain.polling.service;
 
 import com.example.test.domain.polling.config.TronProperties;
+import com.example.test.domain.polling.dto.TronAccountResponse;
 import com.example.test.domain.polling.dto.TronGridResponse;
 import com.example.test.domain.polling.dto.TronTransfer;
 import com.example.test.domain.polling.model.Polling;
@@ -21,6 +22,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -106,6 +108,40 @@ public class PollingService {
         }
     }
 
+    public BigDecimal getUsdtBalance() {
+
+        String vaultAddress = properties.wallet().serverAddress();
+        String usdtContract = properties.token().usdtContract();
+
+        try {
+            TronAccountResponse response = tronGridClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/accounts/{address}")
+                            .build(vaultAddress))
+                    .retrieve()
+                    .bodyToMono(TronAccountResponse.class)
+                    .block();
+
+            if (response == null || response.data() == null || response.data().isEmpty()) {
+                return BigDecimal.ZERO;
+            }
+
+            List<Map<String, String>> balance = response.data().get(0).trc20();
+            if (balance == null) return BigDecimal.ZERO;
+
+            for (Map<String, String> balanceMap : balance) {
+                if (balanceMap.containsKey(usdtContract)) {
+                    String rawBalance = balanceMap.get(usdtContract);
+                    // 실제 usdt 단위로 변환
+                    return new BigDecimal(new BigInteger(rawBalance)).movePointLeft(6);
+                }
+            }
+        } catch (Exception e) {
+            log.error("금고 잔액 조회 중 오류 발생: {}", e.getMessage());
+            throw new CustomException(ErrorCode.TRON_API_ERROR);
+        }
+        return BigDecimal.ZERO;
+    }
 
     // 입출금 확인 및 검증 후 DB 반영
     private void handleTransfer(List<TronTransfer> transfers) {
