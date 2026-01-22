@@ -32,7 +32,7 @@ public enum ErrorCode {
     TRON_API_ERROR(500, "API로 데이터를 가져오지 못했습니다."),
 
     // 트랜잭션 관련 오류
-    TRANSACTION_NOT_FOUND(404, "해당 요청는 없는 요청입니다.");
+    TRANSACTION_NOT_FOUND(404, "해당 요청은 없는 요청입니다.");
 
     private final int status;
     private final String message;
