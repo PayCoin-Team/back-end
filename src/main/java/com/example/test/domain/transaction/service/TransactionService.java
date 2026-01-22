@@ -42,7 +42,7 @@ public class TransactionService {
     ) {
 
         // 유저 내부 지갑 조회
-        UserWallet userWallet = userWalletRepository.findById(userId) // TODO: Lock 고려
+        UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
         // 유저 외부 지갑 조회
         List<ExternalWallet> externalWallets = externalWalletRepository.findAllByUserId(userId);
@@ -64,10 +64,11 @@ public class TransactionService {
         return ResponseTransactionDto.from(savedTransaction);
     }
 
+    // TODO: 성공적으로 출금되어도 Transaction 테이블에 PROCESSING 상태임. txId 검증 후 COMPLETED 상태로 변경시켜야 함.
     public ResponseTransactionDto withdraw(Long userId, RequestTransactionDto dto){
 
         // 유저 내부 지갑 조회
-        UserWallet userWallet = userWalletRepository.findById(userId) // TODO: Lock 고려
+        UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
 
         // 외부 지갑들 조회
@@ -95,7 +96,7 @@ public class TransactionService {
             String txId = tronRawService.sendUSDT(dto.walletAddress(), dto.amount());
 
             savedTransaction.setTxId(txId);
-            savedTransaction.setStatus(Status.PROCESSING); // TODO: txId 검증 후 성공 상태로 변경시켜야 함.
+            savedTransaction.setStatus(Status.PROCESSING);
 
             log.info("출금 성공: TxID={}", txId);
         } catch (Exception e) {
