@@ -108,6 +108,7 @@ public class PollingService {
         }
     }
 
+    // 서버 지갑 잔고 가져오기 함수
     public BigDecimal getUsdtBalance() {
 
         String vaultAddress = properties.wallet().serverAddress();
