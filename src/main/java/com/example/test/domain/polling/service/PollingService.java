@@ -1,10 +1,16 @@
 package com.example.test.domain.polling.service;
 
 import com.example.test.domain.polling.config.TronProperties;
+import com.example.test.domain.polling.dto.ServerBalnceResponse;
+import com.example.test.domain.polling.dto.TronAccountResponse;
 import com.example.test.domain.polling.dto.TronGridResponse;
 import com.example.test.domain.polling.dto.TronTransfer;
 import com.example.test.domain.polling.model.Polling;
 import com.example.test.domain.polling.repository.PollingRepository;
+import com.example.test.domain.transaction.entity.Status;
+import com.example.test.domain.transaction.entity.Transaction;
+import com.example.test.domain.transaction.entity.Type;
+import com.example.test.domain.transaction.repository.TransactionRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +33,11 @@ public class PollingService {
     private final TronProperties properties;
     private final PollingRepository pollingRepository;
     private final WebClient tronGridClient;
+    private final TransactionRepository transactionRepository;
+    // api로 받은 금액 데이터 변환용 소수점
+    private static final int USDT_DECIMALS = 6;
 
+    // polling은 성공한 것만 DB에 반영
     @Transactional
     public void pollingUSDT(){
         Polling polling = pollingRepository.findById(1L)
@@ -96,7 +109,92 @@ public class PollingService {
         }
     }
 
+    // 서버 지갑 잔고 가져오기 함수
+    public ServerBalnceResponse getUsdtBalance() {
 
-    // TODO: 입출금인지 확인 후 DB반영 처리 함수
-    private void handleTransfer(List<TronTransfer> transfers) {}
+        String vaultAddress = properties.wallet().serverAddress();
+        String usdtContract = properties.token().usdtContract();
+
+        BigDecimal trxBalnce = BigDecimal.valueOf(0);
+
+        try {
+            TronAccountResponse response = tronGridClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/v1/accounts/{address}")
+                            .build(vaultAddress))
+                    .retrieve()
+                    .bodyToMono(TronAccountResponse.class)
+                    .block();
+
+            if (response == null || response.data() == null || response.data().isEmpty())
+                throw new Exception();
+
+            trxBalnce = new BigDecimal(new BigInteger(String.valueOf(response.data().get(0).balance())))
+                    .movePointLeft(6);
+
+            List<Map<String, String>> balance = response.data().get(0).trc20();
+            if (balance == null) return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
+
+            for (Map<String, String> balanceMap : balance) {
+                if (balanceMap.containsKey(usdtContract)) {
+                    String rawBalance = balanceMap.get(usdtContract);
+                    // 실제 usdt 단위로 변환
+                    return new ServerBalnceResponse(new BigDecimal(new BigInteger(rawBalance))
+                            .movePointLeft(6), trxBalnce);
+                }
+            }
+        } catch (Exception e) {
+            log.error("금고 잔액 조회 중 오류 발생: {}", e.getMessage());
+            throw new CustomException(ErrorCode.TRON_API_ERROR);
+        }
+        return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
+    }
+
+    // 입출금 확인 및 검증 후 DB 반영
+    private void handleTransfer(List<TronTransfer> transfers) {
+
+        String serverWallet = properties.wallet().serverAddress();
+
+        if(serverWallet == null || serverWallet.isBlank()) throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
+        if (transfers == null || transfers.isEmpty()) return;
+
+        for (TronTransfer t : transfers) {
+            String txId = t.transactionId();
+            String from = t.from();
+            String to = t.to();
+            // String값 변환
+            BigDecimal value = new BigDecimal(new BigInteger(t.value()))
+                    .movePointLeft(USDT_DECIMALS);
+
+            // 입금
+            if(serverWallet.equalsIgnoreCase(to)){
+                Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
+
+                if(ts == null || ts.getStatus() == Status.COMPLETED) continue;
+
+                if(!ts.getType().equals(Type.DEPOSIT) || ts.getAmount().compareTo(value) != 0) {
+                    log.warn("입금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
+                    continue;
+                }
+
+                ts.setStatus(Status.COMPLETED);
+            }
+
+            //출금
+            else if(serverWallet.equalsIgnoreCase(from)){
+                Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
+
+                if(ts == null || ts.getStatus() == Status.COMPLETED ) continue;
+
+                if(!ts.getType().equals(Type.WITHDRAW) || ts.getAmount().compareTo(value) != 0) {
+                    log.warn("출금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
+                    continue;
+                }
+
+                ts.setStatus(Status.COMPLETED);
+            }
+        }
+
+    }
 }
