@@ -115,6 +115,8 @@ public class PollingService {
         String vaultAddress = properties.wallet().serverAddress();
         String usdtContract = properties.token().usdtContract();
 
+        BigDecimal trxBalnce = BigDecimal.valueOf(0);
+
         try {
             TronAccountResponse response = tronGridClient.get()
                     .uri(uriBuilder -> uriBuilder
@@ -124,26 +126,28 @@ public class PollingService {
                     .bodyToMono(TronAccountResponse.class)
                     .block();
 
-            if (response == null || response.data() == null || response.data().isEmpty()) {
-                return new ServerBalnceResponse(BigDecimal.ZERO);
-            }
+            if (response == null || response.data() == null || response.data().isEmpty())
+                throw new Exception();
+
+            trxBalnce = new BigDecimal(new BigInteger(String.valueOf(response.data().get(0).balance())))
+                    .movePointLeft(6);
 
             List<Map<String, String>> balance = response.data().get(0).trc20();
-            if (balance == null) return new ServerBalnceResponse(BigDecimal.ZERO);
+            if (balance == null) return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
 
             for (Map<String, String> balanceMap : balance) {
                 if (balanceMap.containsKey(usdtContract)) {
                     String rawBalance = balanceMap.get(usdtContract);
                     // 실제 usdt 단위로 변환
                     return new ServerBalnceResponse(new BigDecimal(new BigInteger(rawBalance))
-                            .movePointLeft(6));
+                            .movePointLeft(6), trxBalnce);
                 }
             }
         } catch (Exception e) {
             log.error("금고 잔액 조회 중 오류 발생: {}", e.getMessage());
             throw new CustomException(ErrorCode.TRON_API_ERROR);
         }
-        return new ServerBalnceResponse(BigDecimal.ZERO);
+        return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
     }
 
     // 입출금 확인 및 검증 후 DB 반영
