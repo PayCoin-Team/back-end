@@ -1,6 +1,6 @@
 package com.example.test.domain.transaction.controller.api;
 
-import com.example.test.domain.history.dto.response.ResponseTransferDto;
+import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestWithdrawDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
 import com.example.test.global.security.CustomUserDetails;
@@ -11,9 +11,13 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Transaction API", description = "외부 지갑(거래 내역 조회, 입/출금 신청) 관련 API")
 public interface TransactionApi {
@@ -32,6 +36,29 @@ public interface TransactionApi {
 
             @Parameter(description = "출금 요청 입력(금액, 사용자 외부 지갑 주소)", required = true)
             @RequestBody RequestWithdrawDto requestWithdrawDto
+    );
+
+    @Operation(summary = "입/출금 거래 내역 조회", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "거래 내역 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ResponseTransactionDto.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
+            @ApiResponse(responseCode = "400", description = "거래 내역 조회 실패", content = @Content)
+    })
+    ResponseEntity<Page<ResponseTransactionDto>> findTransaction(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+
+            @Parameter(description = "검색 조건 (년)", example = "2026")
+            @RequestParam(required = false) Integer year,
+
+            @Parameter(description = "검색 조건 (월)", example = "1")
+            @RequestParam(required = false) Integer month,
+
+            @Parameter(description = "검색 조건 (타입) 미선택 시 전체")
+            @RequestParam(required = false) Type type,
+
+            @ParameterObject Pageable pageable
     );
 
 

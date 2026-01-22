@@ -2,6 +2,7 @@ package com.example.test.domain.transaction.service;
 
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 import com.example.test.domain.externalWallet.repository.ExternalWalletRepository;
+import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestWithdrawDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
 import com.example.test.domain.transaction.entity.Transaction;
@@ -14,6 +15,8 @@ import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +80,20 @@ public class TransactionService {
         }
 
         return ResponseTransactionDto.from(savedTransaction);
+    }
+
+    // 입/출금 거래 내역 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseTransactionDto> findTransaction(
+            Long userId,
+            Integer year,
+            Integer month,
+            Type type,
+            Pageable pageable
+    ) {
+        // 조회
+        Page<Transaction> transactions = transactionRepository.searchTransaction(userId, year, month, type, pageable);
+
+        return transactions.map(transaction -> ResponseTransactionDto.from(transaction));
     }
 }

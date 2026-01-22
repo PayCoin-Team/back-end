@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 
@@ -17,6 +18,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Table(name = "transaction")
+@NoArgsConstructor
 public class Transaction extends BaseCreateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
