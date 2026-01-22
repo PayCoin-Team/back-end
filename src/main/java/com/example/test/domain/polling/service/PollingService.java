@@ -5,6 +5,10 @@ import com.example.test.domain.polling.dto.TronGridResponse;
 import com.example.test.domain.polling.dto.TronTransfer;
 import com.example.test.domain.polling.model.Polling;
 import com.example.test.domain.polling.repository.PollingRepository;
+import com.example.test.domain.transaction.entity.Status;
+import com.example.test.domain.transaction.entity.Transaction;
+import com.example.test.domain.transaction.entity.Type;
+import com.example.test.domain.transaction.repository.TransactionRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -24,7 +30,11 @@ public class PollingService {
     private final TronProperties properties;
     private final PollingRepository pollingRepository;
     private final WebClient tronGridClient;
+    private final TransactionRepository transactionRepository;
+    // api로 받은 금액 데이터 변환용 소수점
+    private static final int USDT_DECIMALS = 6;
 
+    // polling은 성공한 것만 DB에 반영
     @Transactional
     public void pollingUSDT(){
         Polling polling = pollingRepository.findById(1L)
@@ -97,6 +107,51 @@ public class PollingService {
     }
 
 
-    // TODO: 입출금인지 확인 후 DB반영 처리 함수
-    private void handleTransfer(List<TronTransfer> transfers) {}
+    // 입출금 확인 및 검증 후 DB 반영
+    private void handleTransfer(List<TronTransfer> transfers) {
+
+        String serverWallet = properties.wallet().serverAddress();
+
+        if(serverWallet == null || serverWallet.isBlank()) throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
+
+        if (transfers == null || transfers.isEmpty()) return;
+
+        for (TronTransfer t : transfers) {
+            String txId = t.transactionId();
+            String from = t.from();
+            String to = t.to();
+            // String값 변환
+            BigDecimal value = new BigDecimal(new BigInteger(t.value()))
+                    .movePointLeft(USDT_DECIMALS);
+
+            // 입금
+            if(serverWallet.equalsIgnoreCase(to)){
+                Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
+
+                if(ts == null || ts.getStatus() == Status.COMPLETED) continue;
+
+                if(!ts.getType().equals(Type.DEPOSIT) || ts.getAmount().compareTo(value) != 0) {
+                    log.warn("입금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
+                    continue;
+                }
+
+                ts.setStatus(Status.COMPLETED);
+            }
+
+            //출금
+            else if(serverWallet.equalsIgnoreCase(from)){
+                Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
+
+                if(ts == null || ts.getStatus() == Status.COMPLETED ) continue;
+
+                if(!ts.getType().equals(Type.WITHDRAW) || ts.getAmount().compareTo(value) != 0) {
+                    log.warn("출금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
+                    continue;
+                }
+
+                ts.setStatus(Status.COMPLETED);
+            }
+        }
+
+    }
 }
