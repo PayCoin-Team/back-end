@@ -4,7 +4,6 @@ import com.example.test.domain.user.controller.api.AuthApi;
 import com.example.test.domain.user.dto.request.RequestUserDto;
 import com.example.test.domain.user.service.AuthService;
 import com.example.test.global.security.LoginFilter;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
