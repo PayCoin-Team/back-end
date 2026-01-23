@@ -32,8 +32,34 @@ public class AuthService {
     private final VerificationService verificationService;
 
 
+    // 회원가입 인증번호 발송
+    public void sendSignupCode(String email) {
+        // 이미 가입된 이메일인지 확인
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND); // 실제로는 DUPLICATE_EMAIL 등의 에러가 적합함
+        }
+
+        // 6자리 랜덤 코드 생성 및 저장
+        String code = UUID.randomUUID().toString().substring(0, 6);
+        verificationService.saveCode(email, code);
+
+        String htmlContent = getEmailHtmlLayout(
+                "회원가입 인증번호",
+                "CrossPay 가입을 위한 인증번호입니다. 요청하신 페이지에 아래 번호를 입력해 주세요.",
+                code,
+                "인증번호는 보안을 위해 메모리에 잠시 동안만 유지됩니다."
+        );
+
+        sendMail(email, "[CrossPay] 회원가입 인증번호 안내", htmlContent);
+    }
+
     // 회원가입
     public void saveUser(RequestUserDto requestUserDto) {
+        // 인증번호 검증
+        if (!verificationService.verifyCode(requestUserDto.email(), requestUserDto.code())) {
+            throw new CustomException(ErrorCode.INVALID_SIGNATURE);
+        }
+
         // 아이디 중복 예외
         if(userRepository.existsByUsername(requestUserDto.username())) {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
@@ -52,6 +78,9 @@ public class AuthService {
         user.setUserWallet(userWallet);
 
         userRepository.save(user);
+
+        // 가입 완료 후 메모리에서 인증 정보 삭제
+        verificationService.clear(requestUserDto.email());
     }
 
     // 공통 이메일 발송 메서드
