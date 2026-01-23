@@ -24,6 +24,10 @@ public class Transaction extends BaseCreateEntity {
     @Column(name = "amount", nullable = false, precision = 18, scale = 6)
     private BigDecimal amount;
 
+    @NotNull
+    @Column(name = "fee", nullable = false, precision = 18, scale = 6)
+    private BigDecimal fee = BigDecimal.ZERO;
+
     @Size(max = 64)
     @NotNull
     @Column(name = "to_address", nullable = false, length = 64)
