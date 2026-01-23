@@ -78,6 +78,8 @@ dependencies {
     // tron 주소 변환 라이브러리
     implementation("io.github.tronprotocol:trident:0.9.2")
 
+    // 이메일 발송
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
