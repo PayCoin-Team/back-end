@@ -2,7 +2,7 @@ package com.example.test.domain.transaction.service;
 
 import com.example.test.domain.polling.config.TronProperties;
 import com.example.test.domain.transaction.dto.TronTxidResponse;
-import com.example.test.domain.transaction.entity.Status;
+import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.entity.Transaction;
 import com.example.test.domain.transaction.repository.TransactionRepository;
 import com.example.test.global.exception.CustomException;

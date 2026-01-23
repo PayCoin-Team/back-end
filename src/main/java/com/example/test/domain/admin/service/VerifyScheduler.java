@@ -4,7 +4,7 @@ import com.example.test.domain.admin.entity.Difference;
 import com.example.test.domain.admin.entity.Verification;
 import com.example.test.domain.admin.repository.VerificationRepository;
 import com.example.test.domain.polling.service.PollingService;
-import com.example.test.domain.transaction.entity.Status;
+import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.repository.TransactionRepository;
 import com.example.test.domain.userwallet.repository.UserWalletRepository;
 import lombok.RequiredArgsConstructor;

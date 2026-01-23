@@ -1,6 +1,5 @@
 package com.example.test.domain.userwallet.repository;
 
-import com.example.test.domain.transaction.entity.Status;
 import com.example.test.domain.userwallet.entity.UserWallet;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;

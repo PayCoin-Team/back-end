@@ -1,8 +1,7 @@
 package com.example.test.domain.transaction.repository;
 
-import com.example.test.domain.transaction.entity.Status;
+import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.entity.Transaction;
-import com.example.test.domain.transaction.entity.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
