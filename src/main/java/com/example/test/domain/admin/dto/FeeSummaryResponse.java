@@ -6,5 +6,5 @@ import java.math.BigDecimal;
 
 
 public record FeeSummaryResponse(BigDecimal totalFees,
-                                 BigDecimal todayFees) {
+                                 BigDecimal yesterdayFees) {
 }
