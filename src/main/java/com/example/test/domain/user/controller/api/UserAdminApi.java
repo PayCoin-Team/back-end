@@ -59,4 +59,16 @@ public interface UserAdminApi {
 
             @ParameterObject Pageable pageable
     );
+
+    @Operation(summary = "관리자 전용 회원 상세 정보 조회", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 상세 정보 조회 성공",
+                    content = @Content(schema = @Schema(implementation = ResponseUserDto.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
+            @ApiResponse(responseCode = "403", description = "일반 회원 접근 차단", content = @Content)
+    })
+    ResponseEntity<UserStatusResponse> findSpecificUser(
+            @Parameter(description = "회원 id", required = true , example = "1")
+            @PathVariable("userId") Long userId
+    );
 }

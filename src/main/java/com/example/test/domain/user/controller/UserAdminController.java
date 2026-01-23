@@ -47,6 +47,15 @@ public class UserAdminController implements UserAdminApi {
             @RequestParam(name = "keyword", required = false) String keyword,
             @ParameterObject Pageable pageable
     ) {
-        return  ResponseEntity.ok(userAdminService.findAllUser(keyword, pageable));
+        return ResponseEntity.ok(userAdminService.findAllUser(keyword, pageable));
+    }
+
+    // 관리자 전용 회원 상세 정보 조회
+    @Override
+    @GetMapping("/users/{userId}")
+    public ResponseEntity<UserStatusResponse> findSpecificUser(
+            @PathVariable("userId") Long userId
+    ) {
+        return ResponseEntity.ok(userAdminService.findSpecificUser(userId));
     }
 }

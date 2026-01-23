@@ -53,10 +53,22 @@ public class UserAdminService {
         return UserStatusResponse.from(user, userWallet);
     }
 
-// 페이지별 회원 목록 조회
+    // 페이지별 회원 목록 조회
     public Page<ResponseUserDto> findAllUser(String keyword, Pageable pageable) {
 
         Page<User> users = userRepository.findAllUser(pageable, keyword);
         return users.map(user -> ResponseUserDto.dtoToEntity(user));
+    }
+
+    // 회원 정보 상세 조회
+    public UserStatusResponse findSpecificUser(Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+        UserWallet userWallet = userWalletRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
+
+        return UserStatusResponse.from(user, userWallet);
     }
 }
