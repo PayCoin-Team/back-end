@@ -6,6 +6,7 @@ import com.example.test.global.time.BaseCreateEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,12 +20,11 @@ import java.math.BigDecimal;
 @Table(name = "transaction")
 @NoArgsConstructor
 public class Transaction extends BaseCreateEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "transaction_id", nullable = false)
     private Long id;
 
-    @NotNull
     @Column(name = "amount", nullable = false, precision = 18, scale = 6)
     private BigDecimal amount;
 
@@ -45,13 +45,11 @@ public class Transaction extends BaseCreateEntity {
     @Column(name = "txid", length = 100)
     private String txid;
 
-    @Size(max = 30)
     @NotNull
     @Column(name = "type", nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
     private Type type;
 
-    @Size(max = 30)
     @NotNull
     @Column(name = "status", nullable = false, length = 30)
     @Enumerated(EnumType.STRING)
@@ -61,5 +59,17 @@ public class Transaction extends BaseCreateEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "externalwallet", nullable = false)
     private ExternalWallet externalWallet;
+
+    @Builder
+    public Transaction(BigDecimal amount, String toAddress, String fromAddress, String txid, Type type, ExternalWallet externalWallet) {
+
+        this.amount = amount;
+        this.toAddress = toAddress;
+        this.fromAddress = fromAddress;
+        this.txid = txid;
+        this.type = type;
+        this.status = Status.PENDING;
+        this.externalWallet = externalWallet;
+    }
 
 }
