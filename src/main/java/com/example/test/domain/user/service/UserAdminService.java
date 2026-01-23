@@ -1,6 +1,7 @@
 package com.example.test.domain.user.service;
 
 import com.example.test.domain.user.dto.response.CountUserDto;
+import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.dto.response.UserStatusResponse;
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.user.enums.Role;
@@ -10,6 +11,8 @@ import com.example.test.domain.userwallet.repository.UserWalletRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,5 +51,12 @@ public class UserAdminService {
         }
 
         return UserStatusResponse.from(user, userWallet);
+    }
+
+// 페이지별 회원 목록 조회
+    public Page<ResponseUserDto> findAllUser(String keyword, Pageable pageable) {
+
+        Page<User> users = userRepository.findAllUser(pageable, keyword);
+        return users.map(user -> ResponseUserDto.dtoToEntity(user));
     }
 }

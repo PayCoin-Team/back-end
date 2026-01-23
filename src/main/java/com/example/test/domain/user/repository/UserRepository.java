@@ -2,11 +2,12 @@ package com.example.test.domain.user.repository;
 
 import com.example.test.domain.user.entity.User;
 import com.example.test.domain.user.enums.Role;
+import com.example.test.domain.user.repository.impl.UserRepositoryCustom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom {
 
     Boolean existsByUsername (String username);
     Optional<User> findByUsername (String username);
