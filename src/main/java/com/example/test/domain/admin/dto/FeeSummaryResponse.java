@@ -1,4 +1,10 @@
 package com.example.test.domain.admin.dto;
 
-public class FeeSummaryResponse {
+import lombok.Builder;
+
+import java.math.BigDecimal;
+
+
+public record FeeSummaryResponse(BigDecimal totalFees,
+                                 BigDecimal todayFees) {
 }
