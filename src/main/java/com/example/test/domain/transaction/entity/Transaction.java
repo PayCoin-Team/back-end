@@ -1,10 +1,13 @@
 package com.example.test.domain.transaction.entity;
 
+import com.example.test.domain.transaction.enums.Status;
+import com.example.test.domain.transaction.enums.Type;
 import com.example.test.global.time.BaseCreateEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 
@@ -14,6 +17,7 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @Table(name = "transaction")
+@NoArgsConstructor
 public class Transaction extends BaseCreateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
