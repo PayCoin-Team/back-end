@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -55,5 +56,17 @@ public interface AuthApi {
             @Parameter(description = "확인할 아이디", required = true, example = "test1234")
             @RequestParam String username
     );
+
+    @Operation(summary = "아이디 찾기", description = "이메일을 통해 가입된 사용자의 아이디를 메일로 발송합니다.")
+    ResponseEntity<String> findId(@RequestParam String email);
+
+    @Operation(summary = "비밀번호 재설정 - 인증번호 발송", description = "비밀번호 재설정을 위한 인증번호를 이메일로 발송합니다.")
+    ResponseEntity<String> sendCode(@RequestParam String email);
+
+    @Operation(summary = "비밀번호 재설정 - 인증번호 확인", description = "메일로 받은 인증번호가 유효한지 확인합니다.")
+    ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code);
+
+    @Operation(summary = "비밀번호 재설정 - 실제 변경", description = "인증 성공 후 새로운 비밀번호로 변경합니다.")
+    ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword);
 
 }
