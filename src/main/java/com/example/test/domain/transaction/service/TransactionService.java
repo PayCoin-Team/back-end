@@ -95,7 +95,7 @@ public class TransactionService {
             // TronRawService 호출 (실제 USDT 전송)
             String txId = tronRawService.sendUSDT(dto.walletAddress(), dto.amount());
 
-            savedTransaction.setTxId(txId);
+            savedTransaction.setTxid(txId);
             savedTransaction.setStatus(Status.PROCESSING);
 
             log.info("출금 성공: TxID={}", txId);

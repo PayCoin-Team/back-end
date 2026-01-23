@@ -24,7 +24,7 @@ public record RequestTransactionDto(
                         .amount(amount)
                         .toAddress(walletAddress)
                         .fromAddress(serviceAddress)
-                        .txId(null)
+                        .txid(null)
                         .type(Type.WITHDRAW)
                         .externalWallet(externalWallet)
                         .build();
@@ -36,7 +36,7 @@ public record RequestTransactionDto(
                         .amount(amount)
                         .toAddress(serviceAddress)
                         .fromAddress(walletAddress)
-                        .txId(null)
+                        .txid(null)
                         .type(Type.DEPOSIT)
                         .externalWallet(externalWallet)
                         .build();

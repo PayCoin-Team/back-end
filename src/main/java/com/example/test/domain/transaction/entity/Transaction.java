@@ -20,12 +20,17 @@ import java.math.BigDecimal;
 @Table(name = "transaction")
 @NoArgsConstructor
 public class Transaction extends BaseCreateEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "amount", nullable = false, precision = 18, scale = 6)
     private BigDecimal amount;
+
+    @NotNull
+    @Column(name = "fee", nullable = false, precision = 18, scale = 6)
+    private BigDecimal fee = BigDecimal.ZERO;
 
     @Size(max = 64)
     @NotNull
@@ -38,10 +43,7 @@ public class Transaction extends BaseCreateEntity {
 
     @Size(max = 100)
     @Column(name = "txid", length = 100)
-    private String txId;
-
-    @Column(name = "log_index")
-    private Integer logIndex;
+    private String txid;
 
     @NotNull
     @Column(name = "type", nullable = false, length = 30)
@@ -59,13 +61,12 @@ public class Transaction extends BaseCreateEntity {
     private ExternalWallet externalWallet;
 
     @Builder
-    public Transaction(BigDecimal amount, String toAddress, String fromAddress, String txId, Type type, ExternalWallet externalWallet) {
+    public Transaction(BigDecimal amount, String toAddress, String fromAddress, String txid, Type type, ExternalWallet externalWallet) {
 
         this.amount = amount;
         this.toAddress = toAddress;
         this.fromAddress = fromAddress;
-        this.txId = txId;
-        this.logIndex = null;
+        this.txid = txid;
         this.type = type;
         this.status = Status.PENDING;
         this.externalWallet = externalWallet;

@@ -4,7 +4,6 @@ import com.example.test.domain.transaction.entity.Transaction;
 import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.enums.Type;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,7 +23,7 @@ public record ResponseTransactionDto(
 
         return new ResponseTransactionDto(
                 transaction.getId(),
-                transaction.getTxId(),
+                transaction.getTxid(),
                 transaction.getAmount(),
                 transaction.getType(),
                 transaction.getStatus(),
