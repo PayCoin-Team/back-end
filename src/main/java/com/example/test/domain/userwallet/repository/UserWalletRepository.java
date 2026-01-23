@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface UserWalletRepository extends JpaRepository<UserWallet, Long> {
@@ -18,4 +19,7 @@ public interface UserWalletRepository extends JpaRepository<UserWallet, Long> {
     Optional<UserWallet> findByUserIdWithLock (@Param("userId") Long userId);
 
     Optional<UserWallet> findByPublicAddress (String publicAddress);
+
+    @Query("SELECT COALESCE(SUM(s.balance), 0) from UserWallet s")
+    BigDecimal sumBalances();
 }

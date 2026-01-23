@@ -62,6 +62,12 @@ dependencies {
 
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
+    // Spring AI
+    implementation('org.springframework.ai:spring-ai-openai-spring-boot-starter:1.0.0-M6') {
+        exclude group: 'io.swagger.core.v3', module: 'swagger-annotations'
+        exclude group: 'io.swagger.core.v3', module: 'swagger-models'
+    }
+
     // 버전 충돌 해결을 위한 강제 고정
     constraints {
         implementation('io.swagger.core.v3:swagger-annotations-jakarta:2.2.30')
@@ -76,6 +82,7 @@ dependencies {
 
     // [추가] 표준 Protobuf 라이브러리 명시 (Spring Boot와 호환용)
     implementation 'com.google.protobuf:protobuf-java:3.25.1'
+
 
 }
 
