@@ -37,4 +37,32 @@ public class AuthController implements AuthApi {
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
         return ResponseEntity.status(HttpStatus.OK).body(authService.checkUsername(username));
     }
+
+    @Override
+    @PostMapping("/find-id")
+    public ResponseEntity<String> findId(@RequestParam String email) {
+        authService.findUsername(email);
+        return ResponseEntity.ok("아이디를 메일로 발송했습니다.");
+    }
+
+    @Override
+    @PostMapping("/password/send-code")
+    public ResponseEntity<String> sendCode(@RequestParam String email) {
+        authService.sendResetCode(email);
+        return ResponseEntity.ok("인증번호가 발송되었습니다.");
+    }
+
+    @Override
+    @PostMapping("/password/verify-code")
+    public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
+        authService.confirmCode(email, code);
+        return ResponseEntity.ok("인증 성공");
+    }
+
+    @Override
+    @PatchMapping("/password/reset")
+    public ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword) {
+        authService.updatePassword(email, newPassword);
+        return ResponseEntity.ok("비밀번호 변경 완료");
+    }
 }
