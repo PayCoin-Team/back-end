@@ -1,11 +1,13 @@
 package com.example.test.domain.user.controller;
 
 import com.example.test.domain.user.controller.api.UserApi;
+import com.example.test.domain.user.dto.request.ChangePasswordDto;
 import com.example.test.domain.user.dto.request.RequestUserDto;
 import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.domain.user.service.UserService;
 import com.example.test.global.security.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -43,9 +45,20 @@ public class UserController implements UserApi {
     // 회원 탈퇴
     @DeleteMapping("/delete")
     public ResponseEntity<String> withdraw(
-        @AuthenticationPrincipal CustomUserDetails user
+            @AuthenticationPrincipal CustomUserDetails user
     ) {
         userService.deleteUser(user.getId());
         return ResponseEntity.status(HttpStatus.OK).body("회원 탈퇴되었습니다.");
+    }
+
+    // 회원 비밀번호 변경 (로그인 시)
+    @Override
+    @PatchMapping("/update/password")
+    public ResponseEntity<String> changePassword(
+            @AuthenticationPrincipal CustomUserDetails user,
+            @RequestBody @Valid ChangePasswordDto changePasswordDto) {
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userService.changePassword(user.getId(), changePasswordDto));
     }
 }
