@@ -23,6 +23,13 @@ public class AuthController implements AuthApi {
     @PostMapping("/logout")
     public void logout() {}
 
+    @Override
+    @PostMapping("/signup/send-code")
+    public ResponseEntity<String> sendSignupCode(@RequestParam String email) {
+        authService.sendSignupCode(email);
+        return ResponseEntity.ok("인증번호가 발송되었습니다.");
+    }
+
     @PostMapping("/join")
     public ResponseEntity<String> join(
             @Valid @RequestBody RequestUserDto requestUserDto

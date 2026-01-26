@@ -26,7 +26,7 @@ public class ExchangeRateScheduler {
     private String forexApiKey;
 
     // 1분마다 실행
-    @Scheduled(fixedDelay = 60000)
+    @Scheduled(cron = "0 0 * * * *")
     @Transactional
     public void pollExchangeRates() {
         try {

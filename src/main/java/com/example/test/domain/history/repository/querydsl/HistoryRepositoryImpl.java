@@ -83,4 +83,29 @@ public class HistoryRepositoryImpl implements HistoryRepositoryCustom {
         if(Type.WITHDRAWAL.equals(type)) return senderWallet.user.id.eq(userId);
         return null;
     }
+
+    // 오늘 송금한 회원 조회
+    @Override
+    public List<Long> findActiveSenderIds(LocalDateTime start, LocalDateTime end) {
+        QUserWallet senderWallet = new QUserWallet("senderWallet");
+        return queryFactory
+                .select(senderWallet.user.id)
+                .from(history)
+                .join(history.sender, senderWallet)
+                .where(history.createdAt.goe(start).and(history.createdAt.lt(end)))
+                .distinct()
+                .fetch();
+    }
+
+    @Override
+    public List<Long> findActiveReceiverIds(LocalDateTime start, LocalDateTime end) {
+        QUserWallet receiverWallet = new QUserWallet("receiverWallet");
+        return queryFactory
+                .select(receiverWallet.user.id)
+                .from(history)
+                .join(history.receiver, receiverWallet)
+                .where(history.createdAt.goe(start).and(history.createdAt.lt(end)))
+                .distinct()
+                .fetch();
+    }
 }

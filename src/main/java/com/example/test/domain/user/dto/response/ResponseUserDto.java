@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 @Builder
 public record ResponseUserDto(
+        Long userId,
         String username,
         String email,
         String firstName,
@@ -14,7 +15,8 @@ public record ResponseUserDto(
 ) {
     public static ResponseUserDto dtoToEntity(User user) {
         return ResponseUserDto.builder()
-                .username((user.getUsername()))
+                .userId(user.getId())
+                .username(user.getUsername())
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())

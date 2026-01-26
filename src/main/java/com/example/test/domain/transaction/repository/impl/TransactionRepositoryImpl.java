@@ -70,4 +70,17 @@ public class TransactionRepositoryImpl implements  TransactionRepositoryCustom {
         LocalDateTime end = start.plusMonths(1);
         return transaction.createdAt.goe(start).and(transaction.createdAt.lt(end));
     }
+
+    @Override
+    public List<Long> findActiveUserIds(LocalDateTime start, LocalDateTime end) {
+        return queryFactory
+                .select(transaction.externalWallet.user.id)
+                .from(transaction)
+                .join(transaction.externalWallet, externalWallet)
+                .where(
+                        transaction.createdAt.goe(start).and(transaction.createdAt.lt(end))
+                )
+                .distinct()
+                .fetch();
+    }
 }

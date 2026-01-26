@@ -69,4 +69,7 @@ public interface AuthApi {
     @Operation(summary = "비밀번호 재설정 - 실제 변경", description = "인증 성공 후 새로운 비밀번호로 변경합니다.")
     ResponseEntity<String> resetPassword(@RequestParam String email, @RequestParam String newPassword);
 
+    @Operation(summary = "회원가입 인증번호 발송", description = "회원가입 전 이메일 소유 확인을 위해 인증번호를 발송합니다.")
+    @ApiResponse(responseCode = "200", description = "인증번호 발송 성공")
+    ResponseEntity<String> sendSignupCode(@RequestParam String email);
 }

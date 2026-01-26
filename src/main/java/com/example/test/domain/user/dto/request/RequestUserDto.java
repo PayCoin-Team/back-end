@@ -21,7 +21,9 @@ public record RequestUserDto(
         String firstName,
 
         @NotBlank(message = "이름 채워라")
-        String lastName
+        String lastName,
+
+        String code
 ) {
     public User dtoToEntity(String encodedPassword) {
         return User.builder()
