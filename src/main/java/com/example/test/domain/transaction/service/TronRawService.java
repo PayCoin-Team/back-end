@@ -28,7 +28,7 @@ public class TronRawService {
     private String trongridBaseUrl; // "https://nile.trongrid.io"
 
     /**
-     * Fuck! 트론 라이브러리. 서비스 지갑에게 출금 요청 함수
+     * 트론 라이브러리. 서비스 지갑에게 출금 요청 함수
      * @Param toAddress 사용자 지갑 주소(String)
      * @Param amount 금액 파라미터로 입력 받음
      * */

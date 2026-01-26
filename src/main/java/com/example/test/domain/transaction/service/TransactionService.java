@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.web3j.tx.Transfer;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 @Slf4j
@@ -57,10 +58,6 @@ public class TransactionService {
                 .findFirst()
                 .orElseThrow(() -> new CustomException(ErrorCode.EXTERNAL_WALLET_NOT_FOUND));
 
-        // TODO: txId 검증 필요
-
-        // 유저 내부 지갑 잔액 변경 (검증 성공되면 내부 지갑 잔액 변경 및 상태 COMPLETED 변경)
-        // userWallet.setBalance(userWallet.getBalance().add(dto.amount()));
 
         // 트랜잭션 기록
         Transaction transaction = dto.depositToEntity(targetExternalWallet, serviceWalletAddress);
@@ -70,6 +67,9 @@ public class TransactionService {
     }
 
     public ResponseTransactionDto withdraw(Long userId, RequestTransactionDto dto){
+
+        if(dto.amount().compareTo(BigDecimal.valueOf(5)) < 0)
+            throw new CustomException(ErrorCode.INVALID_BALANCE);
 
         // 유저 내부 지갑 조회
         UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
@@ -94,13 +94,21 @@ public class TransactionService {
         var savedTransaction = transactionRepository.save(transaction);
 
         try {
-            log.info("트론 네트워크로 출금 시도: Address={}, Amount={}", dto.walletAddress(), dto.amount());
+
+            BigDecimal fee = dto.amount().subtract(BigDecimal.valueOf(2))
+                    .multiply(BigDecimal.valueOf(0.001)).setScale(6, RoundingMode.DOWN);
+
+            BigDecimal withdrawAmount = dto.amount().subtract(fee);
+
+            log.info("트론 네트워크로 출금 시도: Address={}, Amount={}", dto.walletAddress(), withdrawAmount);
+
 
             // TronRawService 호출 (실제 USDT 전송)
-            String txId = tronRawService.sendUSDT(dto.walletAddress(), dto.amount());
+            String txId = tronRawService.sendUSDT(dto.walletAddress(), withdrawAmount);
 
             savedTransaction.setTxid(txId);
             savedTransaction.setStatus(Status.COMPLETED);
+            savedTransaction.setFee(fee);
 
             log.info("출금 성공: TxID={}", txId);
         } catch (Exception e) {
