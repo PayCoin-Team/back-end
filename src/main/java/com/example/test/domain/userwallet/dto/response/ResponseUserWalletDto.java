@@ -11,10 +11,10 @@ public record ResponseUserWalletDto(
         Long userId,
         BigDecimal balance,
         String publicAddress,
-        List<String> externalAddress
+        String externalAddress
 ) {
 
-    public static ResponseUserWalletDto from(UserWallet userWallet, List<String> externalAddress) {
+    public static ResponseUserWalletDto from(UserWallet userWallet, String externalAddress) {
 
         return ResponseUserWalletDto.builder()
                 .userId(userWallet.getId())

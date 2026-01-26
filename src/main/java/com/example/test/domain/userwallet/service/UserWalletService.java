@@ -26,19 +26,19 @@ public class UserWalletService {
 
     // 사용자 내부 지갑 조회
     public ResponseUserWalletDto findUserWallet(Long userId) {
-
         // 1. 내부 지갑 조회
         UserWallet userWallet = userWalletRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
 
-        // 2. 해당 유저의 외부 지갑 리스트 조회 및 주소 문자열만 추출
-        List<String> externalAddresses = externalWalletRepository.findAllByUserId(userId)
+        // 2. 외부 지갑 조회 (가장 최근에 등록된 주소 하나만 가져옴)
+        String externalAddress = externalWalletRepository.findAllByUserId(userId)
                 .stream()
+                .findFirst() // 여러 개가 있다면 첫 번째 것을 선택
                 .map(ExternalWallet::getAddress)
-                .collect(Collectors.toList());
+                .orElse(null); // 등록된 지갑이 없으면 null
 
-        // 3. 통합된 DTO 반환
-        return ResponseUserWalletDto.from(userWallet, externalAddresses);
+        // 3. DTO 반환
+        return ResponseUserWalletDto.from(userWallet, externalAddress);
     }
 
     // 내부 지갑 생성
