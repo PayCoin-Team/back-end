@@ -58,7 +58,7 @@ public interface UserApi {
             @AuthenticationPrincipal CustomUserDetails user
     );
 
-    @Operation(summary = "비밀번호 재설정", description = "로그인 한 사용자 비밀번호 재설정")
+    @Operation(summary = "비밀번호 재설정", description = "로그인 한 사용자 비밀번호 재설정 (비밀번호 영문, 숫자, 특수문자를 반드시 포함한 8~20자)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "비밀번호 재설정 성공",
                     content = @Content(schema = @Schema(implementation = String.class))),
