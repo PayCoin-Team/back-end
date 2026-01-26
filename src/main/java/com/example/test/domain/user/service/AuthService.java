@@ -65,6 +65,11 @@ public class AuthService {
             throw new CustomException(ErrorCode.DUPLICATE_USERNAME);
         }
 
+        // 아이디와 비밀번호 일치 여부 확인
+        if(checkPasswordValidation(requestUserDto.username(), requestUserDto.password())) {
+            throw new CustomException(ErrorCode.PASSWORD_CONTAIN_USERNAME);
+        }
+
         // 비밀번호 불일치
         if(!requestUserDto.password().equals(requestUserDto.checkPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
@@ -180,5 +185,13 @@ public class AuthService {
     // 아이디 중복 확인
     public boolean checkUsername(String username) {
         return userRepository.existsByUsername(username);
+    }
+
+    // 아이디, 비밀번호 일치 여부 확인
+    public boolean checkPasswordValidation(String username, String password) {
+
+        // 아이디가 비밀번호에 포함되면 true 리턴
+        if(password.equals(username)) return true;
+        return false;
     }
 }

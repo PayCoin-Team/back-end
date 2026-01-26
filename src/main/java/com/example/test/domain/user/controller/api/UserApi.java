@@ -1,5 +1,6 @@
 package com.example.test.domain.user.controller.api;
 
+import com.example.test.domain.user.dto.request.ChangePasswordDto;
 import com.example.test.domain.user.dto.request.UpdateUserDto;
 import com.example.test.domain.user.dto.response.ResponseUserDto;
 import com.example.test.global.security.CustomUserDetails;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,5 +56,22 @@ public interface UserApi {
     ResponseEntity<String> withdraw(
             @Parameter(hidden = true)
             @AuthenticationPrincipal CustomUserDetails user
+    );
+
+    @Operation(summary = "비밀번호 재설정", description = "로그인 한 사용자 비밀번호 재설정 (비밀번호 영문, 숫자, 특수문자를 반드시 포함한 8~20자)")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "비밀번호 재설정 성공",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "비밀번호 불일치", content = @Content),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
+            @ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음", content = @Content)
+    })
+    ResponseEntity<String> changePassword(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails user,
+
+            @Parameter(description = "비밀번호 재설정")
+            @RequestBody @Valid ChangePasswordDto changePasswordDto
+
     );
 }

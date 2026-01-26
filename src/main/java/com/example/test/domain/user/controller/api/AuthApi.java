@@ -35,7 +35,7 @@ public interface AuthApi {
     })
     void logout();
 
-    @Operation(summary = "회원가입", description = "새로운 회원을 등록합니다.")
+    @Operation(summary = "회원가입", description = "새로운 회원을 등록합니다. (비밀번호 영문, 숫자, 특수문자를 반드시 포함한 8~20자)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "회원가입 성공",
                     content = @Content(schema = @Schema(implementation = String.class))),
