@@ -14,6 +14,7 @@ public enum ErrorCode {
     DUPLICATE_USERNAME(409, "이미 존재하는 아이디입니다."),
     PASSWORD_NOT_MATCH(400, "비밀번호가 일치하지 않습니다."),
     CURRENT_PASSWORD_NOT_MATCH(400, "현재 비밀번호가 일치하지 않습니다."),
+    PASSWORD_CONTAIN_USERNAME(400, "아이디와 비밀번호를 다르게 입력 해주세요."),
 
     // 지갑 연동 관련 오류
     NONCE_NOT_FOUND(404,  "유효한 인증 요청을 찾을 수 없습니다."),

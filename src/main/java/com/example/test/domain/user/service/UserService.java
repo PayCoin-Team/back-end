@@ -21,6 +21,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthService authService;
 
     // 회원 정보 조회
     public ResponseUserDto findUser(Long userId) {
@@ -55,6 +56,11 @@ public class UserService {
         // 현재 비밀번호 일치 여부
         if(!passwordEncoder.matches(dto.password(), user.getPassword())) {
             throw new CustomException(ErrorCode.CURRENT_PASSWORD_NOT_MATCH);
+        }
+
+        // 아이디, 비밀번호 일치 여부 확인
+        if(authService.checkPasswordValidation(user.getUsername(), dto.password())) {
+            throw new CustomException(ErrorCode.PASSWORD_CONTAIN_USERNAME);
         }
 
         // 새 비밀번호 일치 여부

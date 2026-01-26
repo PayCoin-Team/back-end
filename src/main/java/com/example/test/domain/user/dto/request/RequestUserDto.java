@@ -3,6 +3,7 @@ package com.example.test.domain.user.dto.request;
 import com.example.test.domain.user.entity.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 
 public record RequestUserDto(
@@ -14,7 +15,9 @@ public record RequestUserDto(
         String email,
 
         @NotBlank(message = "비밀번호 채워라")
-        String password, // 나중에 비밀번호 최소 길이, 특수문자 포함 구현
+        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$",
+                message = "비밀번호는 영문, 숫자, 특수문자를 포함하여 8~20자리여야 합니다.")
+        String password,
         String checkPassword,
 
         @NotBlank(message = "이름 채워라")
