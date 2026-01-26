@@ -45,4 +45,12 @@ public class AdminController implements AdminControllerApi {
 
         return ResponseEntity.ok(adminService.userTransfer(userId, year, month, pageable));
     }
+
+    // 오늘 거래한 사용자 수
+    @Override
+    @GetMapping("/today/transfer")
+    public ResponseEntity<Long> findTodayActiveUserCount() {
+
+        return ResponseEntity.ok(adminService.findTodayActiveUserCount());
+    }
 }

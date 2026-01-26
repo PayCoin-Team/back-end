@@ -19,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -95,5 +92,23 @@ public class AdminService {
         List<UserTransferDto> pagedContent = mergedList.subList(start, end);
 
         return new PageImpl<>(pagedContent, pageable, mergedList.size());
+    }
+
+    // 오늘 거래한 사용자 수
+    @Transactional(readOnly = true)
+    public Long findTodayActiveUserCount() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        List<Long> transactionUserCount = transactionRepository.findActiveUserIds(start, end);
+        List<Long> historyReceiverCount = historyRepository.findActiveReceiverIds(start, end);
+        List<Long> historySenderCount = historyRepository.findActiveSenderIds(start, end);
+
+        Set<Long> todayTotalCount = new HashSet<>();
+        todayTotalCount.addAll(transactionUserCount);
+        todayTotalCount.addAll(historyReceiverCount);
+        todayTotalCount.addAll(historySenderCount);
+
+        return (long) todayTotalCount.size();
     }
 }

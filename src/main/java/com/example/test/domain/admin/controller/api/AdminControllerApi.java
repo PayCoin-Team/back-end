@@ -67,4 +67,13 @@ public interface AdminControllerApi {
 
             @ParameterObject Pageable pageable
     );
+
+    @Operation(summary = "오늘 거래한 사용자 수 조회", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(schema = @Schema(implementation = Long.class))),
+            @ApiResponse(responseCode = "403", description = "일반 회원 접근 차단", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
+    })
+    ResponseEntity<Long> findTodayActiveUserCount();
 }
