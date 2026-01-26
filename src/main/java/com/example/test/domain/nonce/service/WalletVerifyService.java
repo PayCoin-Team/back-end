@@ -93,26 +93,29 @@ public class WalletVerifyService {
                 java.util.Arrays.copyOfRange(signatureBytes, 32, 64)
         );
 
-        String recoveredAddress;
+        String recoveredHexAddress;
         try {
             // 공개키 추출 및 주소(Hex) 변환
             java.math.BigInteger publicKey = Sign.signedMessageHashToKey(msgHash, sd);
-            recoveredAddress = "41" + Keys.getAddress(publicKey);
+            recoveredHexAddress = "41" + Keys.getAddress(publicKey);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INVALID_SIGNATURE);
         }
 
         // 6. DB 주소 대조
         String storedHexAddress = convertToHex(nonce.getWalletAddress());
-        if (!recoveredAddress.equalsIgnoreCase(storedHexAddress)) {
+        if (!recoveredHexAddress.equalsIgnoreCase(storedHexAddress)) {
             throw new CustomException(ErrorCode.INVALID_SIGNATURE);
         }
+
+        // 7. Hex 주소를 Base58 주소로 변환
+        String base58Address = convertToBase58(recoveredHexAddress);
 
         // 7. 연동 완료 및 임시 데이터 파기
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-        externalWalletRepository.save(new ExternalWallet(user, recoveredAddress));
+        externalWalletRepository.save(new ExternalWallet(user, base58Address));
         nonceRepository.delete(nonce);
     }
 
@@ -124,6 +127,20 @@ public class WalletVerifyService {
             byte[] decoded = Base58.decodeChecked(base58Address);
             // 디코딩된 바이트를 Hex 문자열로 변환
             return Numeric.toHexStringNoPrefix(decoded).toLowerCase();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INVALID_SIGNATURE);
+        }
+    }
+
+    private String convertToBase58(String hexAddress) {
+        try {
+            byte[] rawBytes = Numeric.hexStringToByteArray(hexAddress);
+
+            int version = rawBytes[0] & 0xFF;
+
+            byte[] payload = java.util.Arrays.copyOfRange(rawBytes, 1, rawBytes.length);
+
+            return Base58.encodeChecked(version, payload);
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INVALID_SIGNATURE);
         }
