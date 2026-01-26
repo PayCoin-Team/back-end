@@ -1,4 +1,6 @@
 package com.example.test.domain.transaction.dto;
 
-public record TransferInfo() {
+import java.math.BigDecimal;
+
+public record TransferInfo(String from, String to, BigDecimal amount) {
 }
