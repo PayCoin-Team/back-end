@@ -1,5 +1,6 @@
 package com.example.test.domain.transaction.controller.api;
 
+import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
@@ -16,6 +17,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -77,5 +79,22 @@ public interface TransactionApi {
             @ParameterObject Pageable pageable
     );
 
+    @Operation(summary = "외부 지갑 입금 요청", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "입금 상태",
+                    content = @Content(schema = @Schema(implementation = ResponseTransactionDto.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자", content = @Content),
+            @ApiResponse(responseCode = "404", description = "해당 지갑 주소 없음", content = @Content),
+    })
+    ResponseEntity<ResponseTransactionDto> confirmDeposit(
+            @Parameter(hidden = true)
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+
+            @Parameter(description = "transactionId", required = true)
+            Long transactionId,
+
+            @Parameter(description = "출금 확인 입력(txid)", required = true)
+            @RequestBody RequestConfirmDepositDto req
+            );
 
 }

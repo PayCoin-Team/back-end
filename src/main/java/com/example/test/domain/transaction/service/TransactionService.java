@@ -3,6 +3,7 @@ package com.example.test.domain.transaction.service;
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 import com.example.test.domain.externalWallet.repository.ExternalWalletRepository;
 import com.example.test.domain.transaction.dto.TransferInfo;
+import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
@@ -131,7 +132,10 @@ public class TransactionService {
 
     // 입금확인
     @Transactional
-    public ResponseTransactionDto confirmDeposit(Long transactionId, String txid, Long userId){
+    public ResponseTransactionDto confirmDeposit(Long transactionId, RequestConfirmDepositDto req, Long userId){
+
+        String txid = req.txid();
+
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TRANSACTION_NOT_FOUND));
 
