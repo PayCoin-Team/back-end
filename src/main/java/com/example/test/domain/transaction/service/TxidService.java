@@ -1,6 +1,7 @@
 package com.example.test.domain.transaction.service;
 
 import com.example.test.domain.polling.config.TronProperties;
+import com.example.test.domain.transaction.dto.TransferInfo;
 import com.example.test.domain.transaction.dto.TronTxidResponse;
 import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.entity.Transaction;
@@ -16,21 +17,23 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.tron.trident.utils.Base58Check;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class TxidService {
     private final TronProperties properties;
-    private final TransactionRepository transactionRepository;
     private final @Qualifier("tronGridWebClient") WebClient tronGridClient;
 
     // /wallet/gettransactioninfobyid에서 받아온 데이터의 transfer 구분을 위한 문자열
     private static final String TRANSFER =
             "ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef";
+    private static final int USDT_DECIMALS = 6;
 
     @Transactional
-    public Status findInfoByTxid(Long transactionId, String txid) {
+    public TransferInfo findInfoByTxid(String txid) {
 
         TronTxidResponse tron;
 
@@ -42,7 +45,7 @@ public class TxidService {
                     .bodyToMono(TronTxidResponse.class)
                     .block();
         } catch (WebClientResponseException e) {
-            // txid가 아직 네트워크에 없는 경우(400이나 404)를 PENDING으로 처리
+            // txid가 아직 네트워크에 없는 경우(404)를 PENDING으로 처리
             int code = e.getStatusCode().value();
 
             if (code == 404) {
@@ -52,32 +55,15 @@ public class TxidService {
             }
         }
 
-        Transaction ts = transactionRepository.findById(transactionId)
-                .orElseThrow(() -> new CustomException(ErrorCode.TRANSACTION_NOT_FOUND));
-
-        if (ts.getStatus() == Status.COMPLETED || ts.getStatus() == Status.FAILED)
-            return ts.getStatus();
+        if (tron == null) return null;
 
         // 아직 처리 안됐으면 PENDING 리턴
-        if (isPending(tron)) {
-            ts.setTxid(txid);
-            ts.setStatus(Status.PENDING);
-            return Status.PENDING;
-        }
-
-        // 실패로 오면 FAILED 리턴
         if (!isSuccess(tron)) {
-            ts.setTxid(txid);
-            ts.setStatus(Status.FAILED);
-            return Status.FAILED;
+            throw new CustomException(ErrorCode.TRANSFER_FAILED); // 혹은 별도 처리
         }
 
         // 검증
-        boolean matched = verifyAddress(tron);
-
-        ts.setTxid(txid);
-        ts.setStatus(matched ? Status.COMPLETED : Status.FAILED);
-        return ts.getStatus();
+        return verifyEvent(tron);
     }
 
     public boolean isPending(TronTxidResponse resp) {
@@ -120,33 +106,36 @@ public class TxidService {
     }
 
     // 가져온 이벤트에 서버주소가 포함되어 있는지 확인
-    private boolean verifyAddress(TronTxidResponse tron) {
-        if (tron == null || tron.log() == null || tron.log().isEmpty()) return false;
+    private TransferInfo verifyEvent(TronTxidResponse tron) {
+        if (tron == null || tron.log() == null || tron.log().isEmpty()) return null;
 
-        String serverWallet = properties.wallet().serverAddress();
         String usdtContract = properties.token().usdtContract();
 
-        // 응답 log의 크기가 3이 아니면 시그니쳐, to, from이 다 온게 아니기 때문에 패스
         for (TronTxidResponse.LogEntry log : tron.log()) {
             if (log == null || log.topics() == null || log.topics().size() < 3) continue;
 
-            // 거래한 토큰이 서버에서 사용하는 usdt 컨트랙트 주소와 일치하지 않으면 패스
+            // 컨트랙트 주소 확인
             String tokenBase58 = convertHexToBase58(log.address());
-                if (!usdtContract.equalsIgnoreCase(tokenBase58)) continue;
+            if (!usdtContract.equalsIgnoreCase(tokenBase58)) continue;
 
-            // Transfer 이벤트인지 확인(topic0)
+            // Transfer 이벤트 확인
             String topic0 = topicLower(log.topics().get(0));
             if (!TRANSFER.equals(topic0)) continue;
 
-            // from/to의 지갑주소를 base58 변환시 서버 지갑이 있는지 확인
+            // 정보 추출
             String from = convertHexToBase58(log.topics().get(1));
             String to   = convertHexToBase58(log.topics().get(2));
 
-            if (serverWallet.equalsIgnoreCase(from) || serverWallet.equalsIgnoreCase(to)) {
-                return true;
+            // 금액 파싱
+            BigInteger rawAmount = BigInteger.ZERO;
+            if (log.data() != null && !log.data().isBlank()) {
+                rawAmount = new BigInteger(topicLower(log.data()), 16);
             }
+            BigDecimal amount = new BigDecimal(rawAmount).movePointLeft(USDT_DECIMALS);
+
+            return new TransferInfo(from, to, amount);
         }
-        return false;
+        return null;
     }
 
     // api로 받은 데이터가 transfer인지 확인하기 쉽게하기 위해 필요한 부분만 추출

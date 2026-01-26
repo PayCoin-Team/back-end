@@ -11,10 +11,14 @@ import com.example.test.domain.transaction.enums.Status;
 import com.example.test.domain.transaction.entity.Transaction;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.repository.TransactionRepository;
+import com.example.test.domain.userwallet.entity.UserWallet;
+import com.example.test.domain.userwallet.repository.UserWalletRepository;
 import com.example.test.global.exception.CustomException;
 import com.example.test.global.exception.error.ErrorCode;
+import org.springframework.context.annotation.Lazy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -34,11 +38,14 @@ public class PollingService {
     private final PollingRepository pollingRepository;
     private final WebClient tronGridClient;
     private final TransactionRepository transactionRepository;
+    private final UserWalletRepository userWalletRepository;
     // api로 받은 금액 데이터 변환용 소수점
     private static final int USDT_DECIMALS = 6;
 
+    // 같은 클래스 내에서 트랜잭션 어노테이션을 위한 자기자신 선언
+    @Autowired @Lazy private PollingService pollingService;
+
     // polling은 성공한 것만 DB에 반영
-    @Transactional
     public void pollingUSDT(){
         Polling polling = pollingRepository.findById(1L)
                 .orElseThrow(() -> new CustomException(ErrorCode.ROW_NOT_FOUND));
@@ -82,7 +89,13 @@ public class PollingService {
             List<TronTransfer> transfers = tron.data();
 
             // 입출금 처리
-            handleTransfer(transfers);
+            for (TronTransfer t : transfers) {
+                try {
+                    pollingService.handleTransfer(t);
+                } catch (Exception e) {
+                    log.error("트랜잭션 개별 처리 중 오류: {}", t.transactionId(), e);
+                }
+            }
 
             if (!transfers.isEmpty()) {
                 long pageMax = transfers.stream()
@@ -103,6 +116,7 @@ public class PollingService {
         // timestamp 갱신
         if (newTimeStamp > polling.getLastTimestamp()) {
             polling.setLastTimestamp(newTimeStamp);
+            pollingRepository.save(polling);
             log.info("polling last_timestamp 업데이트");
         } else {
             log.info("새로운 트랜잭션 없음");
@@ -151,15 +165,9 @@ public class PollingService {
     }
 
     // 입출금 확인 및 검증 후 DB 반영
-    private void handleTransfer(List<TronTransfer> transfers) {
+    @Transactional
+    public void handleTransfer(TronTransfer t) {
 
-        String serverWallet = properties.wallet().serverAddress();
-
-        if(serverWallet == null || serverWallet.isBlank()) throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
-
-        if (transfers == null || transfers.isEmpty()) return;
-
-        for (TronTransfer t : transfers) {
             String txId = t.transactionId();
             String from = t.from();
             String to = t.to();
@@ -167,34 +175,70 @@ public class PollingService {
             BigDecimal value = new BigDecimal(new BigInteger(t.value()))
                     .movePointLeft(USDT_DECIMALS);
 
-            // 입금
-            if(serverWallet.equalsIgnoreCase(to)){
-                Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
+            String serverWallet = properties.wallet().serverAddress();
+            if (serverWallet == null || serverWallet.isBlank()) throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR);
 
-                if(ts == null || ts.getStatus() == Status.COMPLETED) continue;
+            // [입금 처리]
+            if (serverWallet.equalsIgnoreCase(to)) {
 
-                if(!ts.getType().equals(Type.DEPOSIT) || ts.getAmount().compareTo(value) != 0) {
-                    log.warn("입금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
-                    continue;
-                }
+            Transaction ts = null;
+            boolean isMatchedByTxid = false;
 
-                ts.setStatus(Status.COMPLETED);
+            Transaction txById = transactionRepository.findByTxid(txId).orElse(null);
+
+            if (txById != null) {
+                // 이미 완료된 건이면 중복 처리 방지하고 종료
+                if (txById.getStatus() == Status.COMPLETED) return;
+
+                // PENDING 상태라면 처리를 위해 선택
+                ts = txById;
+                isMatchedByTxid = true;
             }
+            else
+                // Txid가 없는 미아 데이터 찾기
+                ts = transactionRepository.
+                        findFirstByFromAddressAndToAddressAndAmountAndStatusAndTxidIsNullOrderByCreatedAtAsc
+                                (from, to, value, Status.PENDING).orElse(null);
+
+
+            // 매칭되는 건이 없으면 return
+            if (ts == null) return;
+
+            if (!ts.getType().equals(Type.DEPOSIT)) {
+                log.warn("입금 매칭 실패(타입 불일치) txId: {}", txId);
+                return;
+            }
+
+            // --- 잔액 증가 및 완료 처리 로직 ---
+            Long userId = ts.getExternalWallet().getId();
+            UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
+                    .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
+
+            userWallet.setBalance(userWallet.getBalance().add(value));
+
+            // txid가 없는 레코드의 txid필드 채워주기
+            if (ts.getTxid() == null) {
+                ts.setTxid(txId);
+            }
+
+            ts.setStatus(Status.COMPLETED);
+            log.info("입금 처리 완료 (매칭방식: {}): txId={}, userId={}",
+                    isMatchedByTxid ? "TxID" : "Heuristic", txId, userId);
+        }
 
             //출금
             else if(serverWallet.equalsIgnoreCase(from)){
                 Transaction ts = transactionRepository.findByTxid(txId).orElse(null);
 
-                if(ts == null || ts.getStatus() == Status.COMPLETED ) continue;
+                if(ts == null || ts.getStatus() == Status.COMPLETED ) return;
 
                 if(!ts.getType().equals(Type.WITHDRAW) || ts.getAmount().compareTo(value) != 0) {
                     log.warn("출금 검증 오류 txId: {} from: {}: to={}", txId, from, to);
-                    continue;
+                    return;
                 }
 
                 ts.setStatus(Status.COMPLETED);
             }
-        }
 
     }
 }
