@@ -2,6 +2,7 @@ package com.example.test.domain.transaction.service;
 
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 import com.example.test.domain.externalWallet.repository.ExternalWalletRepository;
+import com.example.test.domain.transaction.dto.TransferInfo;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
@@ -19,7 +20,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.tx.Transfer;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Slf4j
@@ -32,6 +35,7 @@ public class TransactionService {
     private final ExternalWalletRepository externalWalletRepository;
     private final TransactionRepository transactionRepository;
     private final TronRawService tronRawService;
+    private final TxidService txidService;
 
     @Value("${tron.wallet.server-address}")
     private String serviceWalletAddress;
@@ -64,7 +68,6 @@ public class TransactionService {
         return ResponseTransactionDto.from(savedTransaction);
     }
 
-    // TODO: 성공적으로 출금되어도 Transaction 테이블에 PROCESSING 상태임. txId 검증 후 COMPLETED 상태로 변경시켜야 함.
     public ResponseTransactionDto withdraw(Long userId, RequestTransactionDto dto){
 
         // 유저 내부 지갑 조회
@@ -96,7 +99,7 @@ public class TransactionService {
             String txId = tronRawService.sendUSDT(dto.walletAddress(), dto.amount());
 
             savedTransaction.setTxid(txId);
-            savedTransaction.setStatus(Status.PROCESSING);
+            savedTransaction.setStatus(Status.COMPLETED);
 
             log.info("출금 성공: TxID={}", txId);
         } catch (Exception e) {
@@ -124,5 +127,42 @@ public class TransactionService {
         Page<Transaction> transactions = transactionRepository.searchTransaction(userId, year, month, type, pageable);
 
         return transactions.map(transaction -> ResponseTransactionDto.from(transaction));
+    }
+
+    // 입금확인
+    @Transactional
+    public ResponseTransactionDto confirmDeposit(Long transactionId, String txid, Long userId){
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new CustomException(ErrorCode.TRANSACTION_NOT_FOUND));
+
+        if (transaction.getStatus() == Status.COMPLETED) {
+            return ResponseTransactionDto.from(transaction);
+        }
+
+        TransferInfo info = txidService.findInfoByTxid(txid);
+
+        if (!transaction.getExternalWallet().getUser().getId().equals(userId)) {
+            throw new CustomException(ErrorCode.INVALID_USER_ATTEMPT);
+        }
+
+        if(info == null){
+            transaction.setTxid(txid);
+            return ResponseTransactionDto.from(transaction);
+        }
+
+        if (!serviceWalletAddress.equalsIgnoreCase(info.to())) {
+            throw new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
+        }
+
+        UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
+
+        BigDecimal newBalance = userWallet.getBalance().add(info.amount());
+
+        userWallet.setBalance(newBalance);
+        transaction.setStatus(Status.COMPLETED);
+        transaction.setTxid(txid);
+
+        return ResponseTransactionDto.from(transaction);
     }
 }
