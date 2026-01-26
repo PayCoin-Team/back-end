@@ -72,5 +72,4 @@ public class TransactionController implements TransactionApi {
         return ResponseEntity.ok(
                 transactionService.confirmDeposit(transactionId,req, customUserDetails.getId()));
     }
-    
 }
