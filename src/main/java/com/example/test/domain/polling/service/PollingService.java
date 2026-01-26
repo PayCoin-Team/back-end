@@ -126,7 +126,7 @@ public class PollingService {
     // 서버 지갑 잔고 가져오기 함수
     public ServerBalnceResponse getUsdtBalance() {
 
-        String vaultAddress = properties.wallet().serverAddress();
+        String serverAddress = properties.wallet().serverAddress();
         String usdtContract = properties.token().usdtContract();
 
         BigDecimal trxBalnce = BigDecimal.valueOf(0);
@@ -135,7 +135,7 @@ public class PollingService {
             TronAccountResponse response = tronGridClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path("/v1/accounts/{address}")
-                            .build(vaultAddress))
+                            .build(serverAddress))
                     .retrieve()
                     .bodyToMono(TronAccountResponse.class)
                     .block();
@@ -147,21 +147,21 @@ public class PollingService {
                     .movePointLeft(6);
 
             List<Map<String, String>> balance = response.data().get(0).trc20();
-            if (balance == null) return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
+            if (balance == null) return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce,serverAddress);
 
             for (Map<String, String> balanceMap : balance) {
                 if (balanceMap.containsKey(usdtContract)) {
                     String rawBalance = balanceMap.get(usdtContract);
                     // 실제 usdt 단위로 변환
                     return new ServerBalnceResponse(new BigDecimal(new BigInteger(rawBalance))
-                            .movePointLeft(6), trxBalnce);
+                            .movePointLeft(6), trxBalnce, serverAddress);
                 }
             }
         } catch (Exception e) {
             log.error("금고 잔액 조회 중 오류 발생: {}", e.getMessage());
             throw new CustomException(ErrorCode.TRON_API_ERROR);
         }
-        return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce);
+        return new ServerBalnceResponse(BigDecimal.ZERO, trxBalnce, serverAddress);
     }
 
     // 입출금 확인 및 검증 후 DB 반영
