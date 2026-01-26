@@ -29,6 +29,7 @@ public enum ErrorCode {
     // 외부 지갑 관련 오류
     EXTERNAL_WALLET_NOT_FOUND(404, "등록된 지갑이 없습니다."),
     TRANSFER_FAILED(400, "코인 거래가 실패했습니다."),
+    INVALID_BALANCE(403, "출금 가능 최소 금액보다 더 적은 금액입니다."),
 
     // 통화 관련 오류
     EXCHANGE_RATE_NOT_FOUND(404, "통화를 찾을 수 없습니다."),
