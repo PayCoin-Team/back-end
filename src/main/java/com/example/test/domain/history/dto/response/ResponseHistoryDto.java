@@ -14,6 +14,8 @@ public record ResponseHistoryDto(
         String senderLastName,
         String receiverFirstName,
         String receiverLastName,
+        String senderAddress,
+        String receiverAddress,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime transactionTime,
@@ -34,6 +36,8 @@ public record ResponseHistoryDto(
                         history.getSender().getUser().getLastName(),
                         history.getReceiver().getUser().getFirstName(),
                         history.getReceiver().getUser().getLastName(),
+                        history.getSender().getPublicAddress(),
+                        history.getReceiver().getPublicAddress(),
                         history.getCreatedAt(),
                         transferType
                 );
