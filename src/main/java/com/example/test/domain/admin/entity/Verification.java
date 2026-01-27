@@ -34,7 +34,8 @@ public class Verification extends BaseCreateEntity {
 
     @Size(max = 15)
     @NotNull
-    @Column(name = "difference", nullable = false, length = 15)
+    @Column(name = "difference", nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
     private Difference difference;
 
 }
