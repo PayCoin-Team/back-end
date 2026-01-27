@@ -63,7 +63,7 @@ public class HistoryService {
         senderWallet.setBalance(senderWallet.getBalance().subtract(dto.amount()));
         receiverWallet.setBalance(receiverWallet.getBalance().add(dto.amount()));
 
-        History history = dto.dtoToEntity(senderWallet, receiverWallet);
+        History history = dto.dtoToEntity(receiverWallet, senderWallet);
         historyRepository.save(history);
 
         return new ResponseTransferDto(history.getId(), senderWallet.getBalance());
