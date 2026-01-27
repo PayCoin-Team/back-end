@@ -3,7 +3,6 @@ package com.example.test.domain.transaction.service;
 import com.example.test.domain.externalWallet.entity.ExternalWallet;
 import com.example.test.domain.externalWallet.repository.ExternalWalletRepository;
 import com.example.test.domain.transaction.dto.TransferInfo;
-import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
