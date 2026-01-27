@@ -54,6 +54,10 @@ public class User extends BaseTimeEntity {
         if(updateUserDto.lastName() != null) this.lastName = updateUserDto.lastName();
     }
 
+    public String getName() {
+        return (this.lastName != null ? this.lastName : "") + (this.firstName != null ? this.firstName : "");
+    }
+
     public void deleteProfile() {
         this.role = Role.WITH_DRAW;
     }
