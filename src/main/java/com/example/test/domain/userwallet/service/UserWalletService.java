@@ -63,4 +63,13 @@ public class UserWalletService {
         String uuid = UUID.randomUUID().toString().toUpperCase();
         return uuid.substring(0, 4) + "-" + uuid.substring(4, 8);
     }
+
+    // public 지갑 주소로 사용자 이름 확인 (입금 전 확인용)
+    public String verifyPublicAddress(String publicAddress) {
+        UserWallet wallet = userWalletRepository.findByPublicAddress(publicAddress)
+                .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
+
+        // 사용자의 전체 이름을 반환
+        return wallet.getUser().getName();
+    }
 }
