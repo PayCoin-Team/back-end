@@ -94,8 +94,11 @@ public class TransactionService {
 
         try {
 
-            BigDecimal fee = dto.amount().subtract(BigDecimal.valueOf(2))
-                    .multiply(BigDecimal.valueOf(0.001)).setScale(6, RoundingMode.DOWN);
+            BigDecimal fixedFee = BigDecimal.valueOf(2);
+
+            BigDecimal percentFee = dto.amount().multiply(BigDecimal.valueOf(0.001));
+
+            BigDecimal fee = fixedFee.add(percentFee).setScale(6, RoundingMode.DOWN);
 
             BigDecimal withdrawAmount = dto.amount().subtract(fee);
 
