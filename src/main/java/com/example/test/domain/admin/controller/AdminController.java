@@ -3,6 +3,7 @@ package com.example.test.domain.admin.controller;
 import com.example.test.domain.admin.controller.api.AdminControllerApi;
 import com.example.test.domain.admin.dto.FeeSummaryResponse;
 import com.example.test.domain.admin.dto.response.ResponseAllTransactionDto;
+import com.example.test.domain.admin.dto.response.ResponseHistoryCounts;
 import com.example.test.domain.admin.dto.response.UserTransferDto;
 import com.example.test.domain.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,13 @@ public class AdminController implements AdminControllerApi {
     public ResponseEntity<Long> findTodayActiveUserCount() {
 
         return ResponseEntity.ok(adminService.findTodayActiveUserCount());
+    }
+
+    // 오늘 거래된 횟수 및 금액 조회
+    @Override
+    @GetMapping("/today/history")
+    public ResponseEntity<ResponseHistoryCounts> historyTodayCounts() {
+
+        return ResponseEntity.ok(adminService.historyTodayCounts());
     }
 }
