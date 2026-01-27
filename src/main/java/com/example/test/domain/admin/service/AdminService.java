@@ -2,6 +2,7 @@ package com.example.test.domain.admin.service;
 
 import com.example.test.domain.admin.dto.FeeSummaryResponse;
 import com.example.test.domain.admin.dto.response.ResponseAllTransactionDto;
+import com.example.test.domain.admin.dto.response.ResponseHistoryCounts;
 import com.example.test.domain.admin.dto.response.UserTransferDto;
 import com.example.test.domain.admin.entity.Verification;
 import com.example.test.domain.admin.repository.VerificationRepository;
@@ -117,5 +118,14 @@ public class AdminService {
         todayTotalCount.addAll(historySenderCount);
 
         return (long) todayTotalCount.size();
+    }
+
+    // 오늘 거래된 횟수 및 금액 조회
+    @Transactional(readOnly = true)
+    public ResponseHistoryCounts historyTodayCounts() {
+        LocalDateTime start = LocalDate.now().atStartOfDay();
+        LocalDateTime end = start.plusDays(1);
+
+        return historyRepository.historyTodayCounts(start, end);
     }
 }

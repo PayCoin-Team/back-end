@@ -1,8 +1,10 @@
 package com.example.test.domain.history.repository.querydsl;
 
+import com.example.test.domain.admin.dto.response.ResponseHistoryCounts;
 import com.example.test.domain.history.entity.History;
 import com.example.test.domain.history.enums.Type;
 import com.example.test.domain.userwallet.entity.QUserWallet;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -65,7 +67,7 @@ public class HistoryRepositoryImpl implements HistoryRepositoryCustom {
     }
 
     private BooleanExpression userEq(Long userId, QUserWallet senderWallet, QUserWallet receiverWallet) {
-        if(userId == null) return null;
+        if (userId == null) return null;
         return senderWallet.user.id.eq(userId)
                 .or(receiverWallet.user.id.eq(userId));
     }
@@ -78,9 +80,9 @@ public class HistoryRepositoryImpl implements HistoryRepositoryCustom {
     }
 
     private BooleanExpression typeEq(Long userId, Type type, QUserWallet senderWallet, QUserWallet receiverWallet) {
-        if(type == null) return null;
-        if(Type.DEPOSIT.equals(type)) return receiverWallet.user.id.eq(userId);
-        if(Type.WITHDRAWAL.equals(type)) return senderWallet.user.id.eq(userId);
+        if (type == null) return null;
+        if (Type.DEPOSIT.equals(type)) return receiverWallet.user.id.eq(userId);
+        if (Type.WITHDRAWAL.equals(type)) return senderWallet.user.id.eq(userId);
         return null;
     }
 
@@ -107,5 +109,19 @@ public class HistoryRepositoryImpl implements HistoryRepositoryCustom {
                 .where(history.createdAt.goe(start).and(history.createdAt.lt(end)))
                 .distinct()
                 .fetch();
+    }
+
+    // 오늘 거래한 횟수 및 금액
+    @Override
+    public ResponseHistoryCounts historyTodayCounts(LocalDateTime start, LocalDateTime end) {
+        return queryFactory
+                .select(Projections.constructor(ResponseHistoryCounts.class,
+                                history.count(),
+                                history.amount.sum()
+                        )
+                )
+                .from(history)
+                .where(history.createdAt.goe(start).and(history.createdAt.lt(end)))
+                .fetchOne();
     }
 }

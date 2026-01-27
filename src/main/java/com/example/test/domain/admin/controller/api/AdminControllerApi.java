@@ -2,6 +2,7 @@ package com.example.test.domain.admin.controller.api;
 
 import com.example.test.domain.admin.dto.FeeSummaryResponse;
 import com.example.test.domain.admin.dto.response.ResponseAllTransactionDto;
+import com.example.test.domain.admin.dto.response.ResponseHistoryCounts;
 import com.example.test.domain.admin.dto.response.UserTransferDto;
 import com.example.test.domain.exchange.dto.response.ExchangeRateResponseDto;
 import com.example.test.domain.transaction.enums.Type;
@@ -76,4 +77,13 @@ public interface AdminControllerApi {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
     })
     ResponseEntity<Long> findTodayActiveUserCount();
+
+    @Operation(summary = "오늘 거래된 서비스 거래 횟수 및 거래 금액 조회", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(schema = @Schema(implementation = ResponseHistoryCounts.class))),
+            @ApiResponse(responseCode = "403", description = "일반 회원 접근 차단", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
+    })
+    ResponseEntity<ResponseHistoryCounts> historyTodayCounts();
 }
