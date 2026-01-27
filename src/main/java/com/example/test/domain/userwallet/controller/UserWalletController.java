@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -25,5 +26,11 @@ public class UserWalletController implements UserWalletApi {
     ) {
 
         return ResponseEntity.status(HttpStatus.OK).body(userWalletService.findUserWallet(customUserDetails.getId()));
+    }
+
+    @Override
+    @GetMapping("/wallets/verify")
+    public ResponseEntity<String> verifyAddress(@RequestParam("address") String address) {
+        return ResponseEntity.status(HttpStatus.OK).body(userWalletService.verifyPublicAddress(address));
     }
 }
