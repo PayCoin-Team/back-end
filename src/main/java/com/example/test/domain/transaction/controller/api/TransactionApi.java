@@ -1,6 +1,5 @@
 package com.example.test.domain.transaction.controller.api;
 
-import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
