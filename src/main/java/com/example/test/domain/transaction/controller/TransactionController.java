@@ -1,13 +1,11 @@
 package com.example.test.domain.transaction.controller;
 
 import com.example.test.domain.transaction.controller.api.TransactionApi;
-import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.service.TransactionService;
 import com.example.test.global.security.CustomUserDetails;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -64,12 +62,12 @@ public class TransactionController implements TransactionApi {
     }
 
     @Override
-    @GetMapping("/deposit/{transactionId}")
+    @GetMapping("/deposit/{transactionId}/{txid}")
     public ResponseEntity<ResponseTransactionDto> confirmDeposit(
-            CustomUserDetails customUserDetails,
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @PathVariable Long transactionId,
-            RequestConfirmDepositDto req) {
+            @PathVariable String txid) {
         return ResponseEntity.ok(
-                transactionService.confirmDeposit(transactionId,req, customUserDetails.getId()));
+                transactionService.confirmDeposit(transactionId, txid, customUserDetails.getId()));
     }
 }

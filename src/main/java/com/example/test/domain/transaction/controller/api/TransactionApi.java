@@ -93,8 +93,8 @@ public interface TransactionApi {
             @Parameter(description = "transactionId", required = true)
             Long transactionId,
 
-            @Parameter(description = "출금 확인 입력(txid)", required = true)
-            @RequestBody RequestConfirmDepositDto req
+            @Parameter(description = "txid", required = true)
+            String txid
             );
 
 }
