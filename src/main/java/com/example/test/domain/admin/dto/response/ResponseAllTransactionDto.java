@@ -12,6 +12,7 @@ public record ResponseAllTransactionDto(
         String externalAddress,
         BigDecimal amount,
         Type type,   // "DEPOSIT", "WITHDRAW"
+        BigDecimal fee,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createdAt
@@ -30,6 +31,7 @@ public record ResponseAllTransactionDto(
                         address,
                         transaction.getAmount(),
                         transaction.getType(),
+                        transaction.getFee(),
                         transaction.getCreatedAt()
                 );
         }

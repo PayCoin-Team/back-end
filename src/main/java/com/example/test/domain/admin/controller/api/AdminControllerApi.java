@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
+
 @Tag(name = "Admin", description = "관리 API")
 public interface AdminControllerApi {
     @Operation(summary = "전일 수수료와 총 수수료 조회", description = "DB에서 전일 수수료와 총 수수료를 가져옵니다.")
@@ -86,4 +88,21 @@ public interface AdminControllerApi {
             @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
     })
     ResponseEntity<ResponseHistoryCounts> historyTodayCounts();
+
+    @Operation(summary = "관리자 전용 수수료 조회", description = "")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공",
+                    content = @Content(schema = @Schema(implementation = BigDecimal.class))),
+            @ApiResponse(responseCode = "403", description = "일반 회원 접근 차단", content = @Content),
+            @ApiResponse(responseCode = "500", description = "서버 내부 오류", content = @Content)
+    })
+    ResponseEntity<Page<ResponseAllTransactionDto>> findFee(
+            @Parameter(description = "검색 조건 (년)", example = "2026")
+            @RequestParam(required = false) Integer year,
+
+            @Parameter(description = "검색 조건 (월)", example = "01")
+            @RequestParam(required = false) Integer month,
+
+            @ParameterObject Pageable pageable
+    );
 }
