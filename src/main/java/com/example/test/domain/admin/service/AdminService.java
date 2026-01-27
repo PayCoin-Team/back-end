@@ -36,7 +36,7 @@ public class AdminService {
         //오늘 날짜의 자정
         LocalDateTime today = LocalDate.now().atStartOfDay();
 
-        Verification verification = verificationRepository.findFirstByIdOrderById();
+        Verification verification = verificationRepository.findFirstByIdOrderByIdDesc();
 
         BigDecimal totalFees = transactionRepository.sumFees(Status.COMPLETED);
         BigDecimal yesterdayFees = transactionRepository.sumFeesBeforeDate(today);
