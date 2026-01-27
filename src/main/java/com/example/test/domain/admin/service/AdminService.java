@@ -3,6 +3,8 @@ package com.example.test.domain.admin.service;
 import com.example.test.domain.admin.dto.FeeSummaryResponse;
 import com.example.test.domain.admin.dto.response.ResponseAllTransactionDto;
 import com.example.test.domain.admin.dto.response.UserTransferDto;
+import com.example.test.domain.admin.entity.Verification;
+import com.example.test.domain.admin.repository.VerificationRepository;
 import com.example.test.domain.history.entity.History;
 import com.example.test.domain.history.repository.HistoryRepository;
 import com.example.test.domain.transaction.entity.Transaction;
@@ -27,16 +29,21 @@ public class AdminService {
 
     private final TransactionRepository transactionRepository;
     private final HistoryRepository historyRepository;
+    private final VerificationRepository verificationRepository;
 
     public FeeSummaryResponse getFees() {
 
         //오늘 날짜의 자정
         LocalDateTime today = LocalDate.now().atStartOfDay();
 
+        Verification verification = verificationRepository.findFirstByIdOrderById();
+
         BigDecimal totalFees = transactionRepository.sumFees(Status.COMPLETED);
         BigDecimal yesterdayFees = transactionRepository.sumFeesBeforeDate(today);
+        BigDecimal serverBalance = verification.getServerBalance();
+        BigDecimal userBalance = verification.getUserBalance();
 
-        return new FeeSummaryResponse(totalFees, yesterdayFees);
+        return new FeeSummaryResponse(totalFees, yesterdayFees, serverBalance, userBalance);
     }
 
     // 서비스 내 모든 입/출금 내역 조회
