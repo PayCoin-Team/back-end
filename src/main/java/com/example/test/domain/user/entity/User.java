@@ -49,7 +49,6 @@ public class User extends BaseTimeEntity {
     }
 
     public void updateProfile(UpdateUserDto updateUserDto){
-        if(updateUserDto.username() != null) this.username = updateUserDto.username();
         if(updateUserDto.firstName() != null) this.firstName = updateUserDto.firstName();
         if(updateUserDto.lastName() != null) this.lastName = updateUserDto.lastName();
     }
