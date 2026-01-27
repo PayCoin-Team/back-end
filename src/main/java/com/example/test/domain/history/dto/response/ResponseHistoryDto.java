@@ -18,16 +18,16 @@ public record ResponseHistoryDto(
         String receiverAddress,
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        LocalDateTime transactionTime,
+        LocalDateTime createdAt,
 
-        Type type
+        String type
 
 ) {
 
         public static ResponseHistoryDto of(History history, Long viewerId) {
-                Type transferType = history.getReceiver().getId() == viewerId
-                        ? Type.DEPOSIT
-                        : Type.WITHDRAWAL;
+                String transferType = history.getReceiver().getId() == viewerId
+                        ? "receiveMoney" // 받음
+                        : "sendMoney"; // 보냄
 
                 return new ResponseHistoryDto(
                         history.getId(),
