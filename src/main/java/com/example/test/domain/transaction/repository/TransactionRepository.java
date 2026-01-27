@@ -16,7 +16,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("SELECT COALESCE(SUM(t.fee), 0) from Transaction t where t.status = :status")
     BigDecimal sumFees(Status status);
 
-    @Query("SELECT COALESCE(SUM(t.fee), 0) FROM Transaction t WHERE t.createdAt < :date")
+    @Query("SELECT COALESCE(SUM(t.fee), 0) FROM Transaction t WHERE t.createdAt >= :date")
     BigDecimal sumFeesBeforeDate(LocalDateTime date);
 
     Optional<Transaction> findFirstByFromAddressAndToAddressAndAmountAndStatusAndTxidIsNullOrderByCreatedAtAsc(String fromAddress, String fromAddress1, BigDecimal amount, Status status);

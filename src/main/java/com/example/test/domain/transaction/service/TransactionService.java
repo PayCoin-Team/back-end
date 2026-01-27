@@ -140,9 +140,7 @@ public class TransactionService {
 
     // 입금확인
     @Transactional
-    public ResponseTransactionDto confirmDeposit(Long transactionId, RequestConfirmDepositDto req, Long userId){
-
-        String txid = req.txid();
+    public ResponseTransactionDto confirmDeposit(Long transactionId, String txid, Long userId){
 
         Transaction transaction = transactionRepository.findById(transactionId)
                 .orElseThrow(() -> new CustomException(ErrorCode.TRANSACTION_NOT_FOUND));

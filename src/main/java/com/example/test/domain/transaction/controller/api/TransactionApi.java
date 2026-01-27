@@ -1,6 +1,5 @@
 package com.example.test.domain.transaction.controller.api;
 
-import com.example.test.domain.transaction.dto.request.RequestConfirmDepositDto;
 import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.dto.request.RequestTransactionDto;
 import com.example.test.domain.transaction.dto.response.ResponseTransactionDto;
@@ -93,8 +92,8 @@ public interface TransactionApi {
             @Parameter(description = "transactionId", required = true)
             Long transactionId,
 
-            @Parameter(description = "출금 확인 입력(txid)", required = true)
-            @RequestBody RequestConfirmDepositDto req
+            @Parameter(description = "txid", required = true)
+            String txid
             );
 
 }
