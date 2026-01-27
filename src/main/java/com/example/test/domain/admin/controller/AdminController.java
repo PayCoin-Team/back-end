@@ -62,4 +62,16 @@ public class AdminController implements AdminControllerApi {
 
         return ResponseEntity.ok(adminService.historyTodayCounts());
     }
+
+    // 수수료 조회
+    @Override
+    @GetMapping("/find/fee")
+    public ResponseEntity<Page<ResponseAllTransactionDto>> findFee(
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false) Integer month,
+            @ParameterObject Pageable pageable
+    ) {
+
+        return ResponseEntity.ok(adminService.findFee(year, month, pageable));
+    }
 }

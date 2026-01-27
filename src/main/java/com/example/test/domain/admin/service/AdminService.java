@@ -10,6 +10,7 @@ import com.example.test.domain.history.entity.History;
 import com.example.test.domain.history.repository.HistoryRepository;
 import com.example.test.domain.transaction.entity.Transaction;
 import com.example.test.domain.transaction.enums.Status;
+import com.example.test.domain.transaction.enums.Type;
 import com.example.test.domain.transaction.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -127,5 +128,13 @@ public class AdminService {
         LocalDateTime end = start.plusDays(1);
 
         return historyRepository.historyTodayCounts(start, end);
+    }
+
+    // 수수료 조회
+    @Transactional(readOnly = true)
+    public Page<ResponseAllTransactionDto> findFee(Integer year, Integer month, Pageable pageable) {
+
+        Page<Transaction> transactions = transactionRepository.searchTransaction(null, year, month, Type.WITHDRAW, pageable);
+        return transactions.map(transaction -> ResponseAllTransactionDto.from(transaction));
     }
 }
