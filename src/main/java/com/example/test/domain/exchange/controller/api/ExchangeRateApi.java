@@ -1,5 +1,6 @@
 package com.example.test.domain.exchange.controller.api;
 
+import com.example.test.domain.exchange.dto.response.ChartDataDto;
 import com.example.test.domain.exchange.dto.response.ExchangeRateResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +28,7 @@ public interface ExchangeRateApi {
     @GetMapping("/rates")
     ResponseEntity<List<ExchangeRateResponseDto>> getAllRates();
 
+
     @Operation(summary = "USDT 환산 계산기", description = "입력한 USDT 금액을 특정 국가의 통화 가치로 환산합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "환산 성공"),
@@ -39,5 +41,12 @@ public interface ExchangeRateApi {
 
             @Parameter(description = "목표 통화 코드 (KRW, JPY 등)", required = true, example = "KRW")
             @RequestParam String target
+    );
+
+    @Operation(summary = "USDT 시세 차트 데이터 조회", description = "기간별(1D, 1W, 1M, 1Y) USDT 가격 데이터를 리스트로 반환합니다.")
+    @GetMapping("/chart")
+    ResponseEntity<List<ChartDataDto>> getChartData(
+            @Parameter(description = "조회 기간 (1D, 1W, 1M, 1Y)", example = "1D")
+            @RequestParam String period
     );
 }
