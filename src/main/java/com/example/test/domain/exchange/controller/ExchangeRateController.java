@@ -1,6 +1,7 @@
 package com.example.test.domain.exchange.controller;
 
 import com.example.test.domain.exchange.controller.api.ExchangeRateApi;
+import com.example.test.domain.exchange.dto.response.ChartDataDto;
 import com.example.test.domain.exchange.dto.response.ExchangeRateResponseDto;
 import com.example.test.domain.exchange.service.ExchangeRateService;
 import lombok.RequiredArgsConstructor;
@@ -31,5 +32,10 @@ public class ExchangeRateController implements ExchangeRateApi {
     @Override
     public ResponseEntity<BigDecimal> convert(BigDecimal amount, String target) {
         return ResponseEntity.ok(exchangeRateService.convert(amount, target));
+    }
+
+    @Override
+    public ResponseEntity<List<ChartDataDto>> getChartData(String period) {
+        return ResponseEntity.ok(exchangeRateService.getUsdtChartData(period));
     }
 }
