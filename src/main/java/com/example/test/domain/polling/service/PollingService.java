@@ -210,7 +210,7 @@ public class PollingService {
             }
 
             // --- 잔액 증가 및 완료 처리 로직 ---
-            Long userId = ts.getExternalWallet().getId();
+            Long userId = ts.getExternalWallet().getUser().getId();
             UserWallet userWallet = userWalletRepository.findByUserIdWithLock(userId)
                     .orElseThrow(() -> new CustomException(ErrorCode.USER_WALLET_NOT_FOUND));
 
