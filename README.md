@@ -23,6 +23,77 @@ SHOW DATABASES;
 이 프로젝트는 보안이 필요한 DB 접속 정보와 API 키를 application-secret.yml에서 관리합니다.
 src/main/resources/ 폴더 안에 application-secret.yml 파일을 생성하고 내용을 작성하세요.
 
+```
+spring:
+  profiles:
+    include: secret
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+tron:
+  trongrid:
+    base-url: https://nile.trongrid.io
+    timeout-ms: 8000
+  token:
+    usdt-contract: {"코인 컨트랙트 주소값"}
+  wallet:
+    server-address: {"서버 지갑 주소 (금고)"}
+  polling:
+    interval-ms: 3000
+    batch-size: 50
+```
+
+```
+spring:
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: {smtp 이메일 주소}
+    password: {smtp 발급 받은 비밀번호}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  ai:
+    openai:
+      api-key: {OpenAI 키}
+      chat:
+        options:
+          model: gpt-4o
+  datasource:
+    url: jdbc:mysql://localhost:3306/crosspay_was?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+    username: {DB 유저이름
+    password: {DB 비밀번호}
+
+jwt:
+  secret: {jwt-secret}
+  expiration: 3600000
+
+tron:
+  wallet:
+    private-key: {"지갑 프라이빗 키 값"}
+  trongrid:
+    api-key: {trongrid api 키}
+
+api:
+  forex:
+    key: {forex 키 값}
+  upbit:
+    access-key: {upbit access key 값}
+    secret-key: {upbit secret key 값}
+
+```
 ### 4. 서버 실행 (Run)
 설정이 완료되었다면 서버를 실행합니다.
 
